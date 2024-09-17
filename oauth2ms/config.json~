@@ -1,0 +1,9 @@
+   {
+	"tenant_id": "9d359b5f-6c86-4aaa-88b0-c9427be438de",
+	"client_id": "b0536af8-f58e-4f3c-b1a6-ae3d5c5adebb",
+	"client_secret": "pp78Q~7rlGQBYmDPKnkEsU58Wh6nhPv2-7g2Zddf",
+	"redirect_host": "localhost",
+	"redirect_port": "5000",
+	"redirect_path": "/getToken/",
+	"scopes": ["https://outlook.office.com/IMAP.AccessAsUser.All", "https://outlook.office.com/SMTP.Send"]
+   }
