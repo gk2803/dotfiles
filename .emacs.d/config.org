@@ -50,6 +50,7 @@ requires =cmake= and =libvterm-dev=
   (global-set-key (kbd "C-c e") 'end-of-buffer)
   (global-set-key (kbd "M--") 'count-words)
   (global-set-key (kbd "M-o") 'mode-line-other-buffer)
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)
   ;; denote keybindings
   (global-set-key (kbd "C-c M-j") 'denote-journal-extras-new-or-existing-entry)
 #+end_src
@@ -642,10 +643,10 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
 #+end_src
 * YASnippet
 #+begin_src emacs-lisp
-      (use-package yasnippet
-	:ensure t
-	:config
-	    (yas-global-mode 1))
+  (use-package yasnippet
+    :ensure t
+    :config
+    (yas-global-mode 1))
 
 
 #+end_src
@@ -928,5 +929,5 @@ emacs with libxml2 support.
 * Magit
 #+begin_src emacs-lisp
   (use-package magit
-  :ensure t)
+    :ensure t)
 #+end_src
