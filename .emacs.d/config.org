@@ -744,6 +744,8 @@ sunrise times and choose a theme accordingly.
 change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/modus-themes")
+  (use-package modus-themes
+    :ensure t)
   (require 'modus-themes)
   (require 'solar)
 
@@ -794,7 +796,7 @@ change the theme based on the sunset and sunrise times.
     :bind
     ("C-x e" . elfeed)
     :config
-    (setq elfeed-feeds '("https://protesilaos.com/master.xml" "https://rss.reddit.com/r/emacs/")))
+    (setq elfeed-feeds '("https://protesilaos.com/master.xml" )))
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
@@ -952,50 +954,44 @@ emacs with libxml2 support.
 	    ("/uni/Drafts" . ?d)
 	    ("/uni/Archive" . ?a)
 	    ("/uni/Sent Items" . ?s)))
+
+    (require 'cl-lib)
+    (require 'smtpmail)
+
+    ;;; Call the oauth2ms program to fetch the authentication token
+    (defun fetch-access-token ()
+      (with-temp-buffer
+	(call-process "oauth2ms" nil t nil "--encode-xoauth2")
+	(buffer-string)))
+    (add-to-list 'smtpmail-auth-supported 'xoauth2)
+
+       ;;; Add new authentication method for xoauth2
+    (cl-defmethod smtpmail-try-auth-method
+      (process (_mech (eql xoauth2)) user password)
+      (let* ((access-token (fetch-access-token)))
+	(smtpmail-command-or-throw
+	 process
+	 (concat "AUTH XOAUTH2 " access-token)
+	 235)))
+
+       ;;; Register the method
+    (with-eval-after-load 'smtpmail
+      (add-to-list 'smtpmail-auth-supported 'xoauth2))
+
+    ;;smtp config
+    (setq smtpmail-smtp-server "smtp.office365.com"
+	  smtp-default-smtp-server "smtp.office365.com"
+	  smtpmail-smtp-service 587
+	  smtpmail-stream-type 'starttls
+	  message-send-mail-function 'smtpmail-send-it
+	  smtpmail-auth-credentials nil)
+    ;;
+    (setq user-mail-address "std154940@ac.eap.gr"
+	  user-full-name "Georgios Kiriazidis")
+
+    (setq smtpmail-debug-info t)
+    (setq smtpmail-debug-verb t)
     )
-#+end_src
-** smtp
-#+begin_src emacs-lisp
-     ;;; Call the oauth2ms program to fetch the authentication token
-  (require 'cl-lib)
-  (require 'smtpmail)
-
-
-
-  (defun fetch-access-token ()
-    (with-temp-buffer
-      (call-process "oauth2ms" nil t nil "--encode-xoauth2")
-      (buffer-string)))
-
-
-     ;;; Add new authentication method for xoauth2
-  (cl-defmethod smtpmail-try-auth-method
-    (process (_mech (eql xoauth2)) user password)
-    (let* ((access-token (fetch-access-token)))
-      (smtpmail-command-or-throw
-       process
-       (concat "AUTH XOAUTH2 " access-token)
-       235)))
-
-     ;;; Register the method
-  (with-eval-after-load 'smtpmail
-    (add-to-list 'smtpmail-auth-supported 'xoauth2))
-
-  ;;smtp config
-  (setq smtpmail-smtp-server "smtp.office365.com"
-	smtp-default-smtp-server "smtp.office365.com"
-	smtpmail-smtp-service 587
-	smtpmail-stream-type 'starttls
-	message-send-mail-function 'smtpmail-send-it
-	smtpmail-auth-credentials nil)
-
-  ;;
-  (setq user-mail-address "std154940@ac.eap.gr"
-	user-full-name "Georgios Kiriazidis")
-
-  (setq smtpmail-debug-info t)
-  (setq smtpmail-debug-verb t)
-
 
 #+end_src
 * Magit
