@@ -1,0 +1,13 @@
+*
+
+!.gitignore
+!.emacs.d/config.org
+!.emacs.d/config.el
+!bash/.bashrc
+!bspwm/bspwmrc
+!htop/htoprc
+!polybar/config.ini
+!polybar/launch.sh
+!rofi/config.rasi
+!sxhkd/sxhkdrc
+
