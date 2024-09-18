@@ -15,76 +15,43 @@ requires =cmake= and =libvterm-dev=
     (which-key-mode)) ;;ensure t makes sure this package is installed
 #+end_src
 * miscellaneous
-** yes or no 
 #+begin_src emacs-lisp
+  ;; server start
+  (server-start)
+  ;; yes or no alias
   (defalias 'yes-or-no-p 'y-or-n-p)
-#+end_src
-** annoying bell turned off 
-#+begin_src emacs-lisp
-  (setq ring-bell-function 'ignore) ;;annoying bell turned off
-#+end_src
-** no backup, no autosaves
-#+begin_src emacs-lisp
-  (setq make-backup-file nil) ;; no backups
-  (setq auto-save-default nil) ;; no autosaves
-#+End_Src
-** cursor highlight
-this is currently set to null
-#+begin_src emacs-lisp
-  (global-hl-line-mode -1) ;; highlights cursor line
-#+end_src
-** prettify 
-#+begin_src emacs-lisp
-  (global-prettify-symbols-mode t) ;; prettify symbols like lambda
-#+end_src
-** toolbar, menubar, scrollbar 
-#+begin_src emacs-lisp
-  (tool-bar-mode -1) ;; removes tool bar
-  (menu-bar-mode -1) ;; removes menu bar
-  (scroll-bar-mode -1) ;;removes scroll bar
-#+end_src
-** no startup message
-#+begin_src emacs-lisp
+
+  ;; no backups
+  ;; no autosaves
+  (setq make-backup-file nil) 
+  (setq auto-save-default nil)
+
+  ;; cursor highlight
+  (global-hl-line-mode -1)
+
+  ;;prettify symbols like lambda
+  (global-prettify-symbols-mode t)
+
+  ;; no tool bar, menu bar, scroll bar
+  (tool-bar-mode -1) 
+  (menu-bar-mode -1) 
+  (scroll-bar-mode -1)
+
+  ;; startup message
   (setq inhibit-startup-message t)
   (setq inhibit-startup-screen t)
 
-#+end_src
-** kill buffer without prompt
-#+begin_src emacs-lisp
-  (defun rq-kill-buffer ()
-    "kill the current buffer without prompt"
-    (interactive)
-    (kill-buffer (current-buffer)))
-  (global-set-key (kbd "C-x k") 'rq-kill-buffer)
-#+end_src
-** global number mode
-#+begin_src emacs-lisp
   ;; relative numbers even in org mode with bullets 
   (setq display-line-numbers-type 'visual)
-  (global-display-line-numbers-mode)
-#+end_src
-** beginning/end of buffer keybind
-#+begin_src emacs-lisp
+  (global-display-line-numbers-mode) ;; I have no Idea what this is
+
+  ;; global keybindings
   (global-set-key (kbd "C-c a") 'beginning-of-buffer)
   (global-set-key (kbd "C-c e") 'end-of-buffer)
-
-#+end_src
-** word-count keybind
-#+begin_src emacs-lisp
-  (global-set-key (kbd "M--") 'count-words) 
-#+end_src
-** switch between two recently used buffers
-#+begin_src emacs-lisp
+  (global-set-key (kbd "M--") 'count-words)
   (global-set-key (kbd "M-o") 'mode-line-other-buffer)
-#+end_src
-** search and other stuff
-#+begin_src emacs-lisp
-  ;; This option shows matched numbers position out of total matches
-  (setq isearch-lazy-count t)
-  (setq lazy-count-prefix-format "(%s/%s) ")
-  ;; Make regular Isearch interpret the empty space as a regular
-  ;; expression that matches any character between the words you give it
-  (setq search-whitespace-regexp ".*?") 
+  ;; denote keybindings
+  (global-set-key (kbd "C-c M-j") 'denote-journal-extras-new-or-existing-entry)
 #+end_src
 ** mode line
 #+begin_src emacs-lisp
@@ -148,10 +115,6 @@ this is currently set to null
 
 #+end_src
 
-** server start
-#+begin_src emacs-lisp
-  (server-start)
-#+end_src
 * beacon 
 #+begin_src emacs-lisp
   (use-package beacon
@@ -165,6 +128,7 @@ prettifies org-mode
 #+begin_src emacs-lisp
   (use-package org-bullets
     :ensure t
+    :defer t
     :init
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+end_src
@@ -376,7 +340,6 @@ a gateway to our individual notes.
     (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 * Denote
-
 Now, what if I want to reference the source when =denote-region= is
 called?
 1. The function, =my-denote-region-get-source-references=, checks
@@ -478,42 +441,8 @@ reference, if it is a file it inserts the
 	    (denote-infer-keywords nil)
 	    (denote-known-keywords '("curated"))
 	    (denote-prompts '(title keywords)))
-	(call-interactively 'denote)))
+	(call-interactively 'denote)))) 
 
-    )
-  (global-set-key (kbd "C-c M-j") 'denote-journal-extras-new-or-existing-entry)
-
-  (require 'denote-silo-extras)
-  (setq denote-journal-extras-title-format 'day-date-month-year)
-  ;; I will refer to this variable for accessing my silos
-  (setq denote-silo-extras-directories '("~/Nextcloud/Documents/privateNotes"))
-  (require 'denote-journal-extras)
-  (setq denote-journal-extras-directory '"~/Nextcloud/Documents/publicNotes/journal/")
-
-
-  (defvar my-denote-commands-for-silos
-    '(denote
-      denote-date
-      denote-subdirectory
-      denote-template
-      denote-type
-      denote-signature
-      )
-    "List of Denote commands to call after selecting a silo.
-    This is a list of symbols that specify the note-creating
-    interactive functions that Denote provides.")
-
-  (defun my-denote-pick-silo-then-command (silo command)
-    "Select SILO and run Denote COMMAND in it.
-    SILO is a file path from `my-denote-silo-directories', while
-    COMMAND is one among `my-denote-commands-for-silos'."
-    (interactive
-     (list (completing-read "Select a silo: " denote-silo-extras-directories nil t)
-	   (intern (completing-read
-		    "Run command in silo: "
-		    my-denote-commands-for-silos nil t))))
-    (let ((denote-directory silo))
-      (call-interactively command)))
 #+end_src
 * Dired
 ** basic config
@@ -743,7 +672,7 @@ sunrise times and choose a theme accordingly.
 * Modus Themes
 change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/modus-themes")
+
   (use-package modus-themes
     :ensure t)
   (require 'modus-themes)
@@ -793,6 +722,7 @@ change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
   (use-package elfeed
     :ensure t
+    :defer t
     :bind
     ("C-x e" . elfeed)
     :config
@@ -921,9 +851,10 @@ emacs with libxml2 support.
 #+end_src
 * Kindle
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/clip2org/")
-  (require 'clip2org)
-  (setq clip2org-clippings-file "~/Downloads/My Clippings.txt")
+  (use-package clip2org
+    :load-path "~/.emacs.d/clip2org/"
+    :config
+    (setq clip2org-clippings-file "~/Downloads/My Clippings.txt"))
 #+end_src
 * email
 ** mu4e
