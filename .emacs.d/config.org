@@ -343,14 +343,16 @@ a gateway to our individual notes.
 * Denote
 Now, what if I want to reference the source when =denote-region= is
 called?
+
 1. The function, =my-denote-region-get-source-references=, checks
-the current buffer mode, if it is =eww-mode= it inserts the url as a
-reference, if it is a file it inserts the
+   the current buffer mode, if it is =eww-mode= it inserts the url as a
+   reference, if it is a file it inserts the
 2. The function, =denote-region-with-reference= calls =my-denote-region= and
    then adds the reference at the end of the file by calling the first
    function
 3. The function, =my-denote-region= is my version of the function
-   =denote-region= which adds also prompts for a signature.   
+   =denote-region= which adds also prompts for a signature.
+4. 
 
 #+begin_src emacs-lisp
   (use-package denote
@@ -400,6 +402,18 @@ reference, if it is a file it inserts the
       (let ((context (my-denote-region-get-source-reference))
 	    (denote-directory "~/Nextcloud/Documents/publicNotes/"))
 	(my-denote-region '(signature title keywords))
+	(when context
+	  (goto-char (point-max))
+	  (insert "\n")
+	  (insert context))))
+
+    (defun my-denote-region-with-reference ()
+      "Like `my-denote-region-with-reference-zk' but saved at references
+  and has no signature"
+      (interactive)
+      (let ((context (my-denote-region-get-source-reference))
+	    (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
+	(my-denote-region '(title keywords))
 	(when context
 	  (goto-char (point-max))
 	  (insert "\n")
@@ -787,7 +801,6 @@ emacs with libxml2 support.
   (use-package org-anki
     :ensure t
     )
-
 #+end_src
 * Development
 ** Languages
@@ -931,3 +944,4 @@ emacs with libxml2 support.
   (use-package magit
     :ensure t)
 #+end_src
+
