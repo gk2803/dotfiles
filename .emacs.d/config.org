@@ -50,11 +50,7 @@ requires =cmake= and =libvterm-dev=
   (global-set-key (kbd "C-c e") 'end-of-buffer)
   (global-set-key (kbd "M--") 'count-words)
   (global-set-key (kbd "M-o") 'mode-line-other-buffer)
-  (global-set-key (kbd "C-x k") 'kill-current-buffer)
-  ;; denote keybindings
-  (global-set-key (kbd "C-c M-j") 'denote-journal-extras-new-or-existing-entry)
-  ;; toggle modus-themes
-  (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)  
 #+end_src
 ** mode line
 #+begin_src emacs-lisp
@@ -146,11 +142,11 @@ of the python interpreter on our system.
 
 In the same manner we can configure the ~/bin/bash~ codeblock
 #+begin_src emacs-lisp
-    (setq org-babel-python-command "python3")
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((python . t) 
-       (shell . t)))
+  (setq org-babel-python-command "python3")
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t) 
+     (shell . t)))
 #+end_src
 ** miscellaneous
 This is a keybinding for the ~org-store-link~ function that stores a
@@ -350,13 +346,19 @@ called?
    function
 3. The function, =my-denote-region= is my version of the function
    =denote-region= which adds also prompts for a signature.
-4. 
-
 #+begin_src emacs-lisp
   (use-package denote
     :ensure t
-    :config
+    :init
     (setq denote-directory '"~/Nextcloud/Documents/publicNotes")
+    :bind
+    (:map global-map
+	  ("C-c n j" . denote-journal-extras-new-or-existing-entry)
+	  ("C-c n r" . my-denote-reference)
+	  ("C-c n f" . my-denote-fleeting)
+	  ("C-c n n" . my-denote-zk)
+	  )	  
+    :config
     ;; set the order of denote naming scheme
     (setq denote-file-name-components-order '(signature title keywords identifier))      
 
@@ -417,7 +419,7 @@ called?
 	  (insert "\n")
 	  (insert context))))
 
-    (defun my-denote-inbox ()
+    (defun my-denote-fleeting ()
       "Create a simple post note, something you might want to remember,
     everything goes"
       (declare (interactive-only t))
@@ -687,17 +689,15 @@ change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
   (use-package modus-themes
     :ensure t
+    :demand t
+    :bind (("<f5>" . modus-themes-toggle))
     :config
     ;; configure modus themes
     (setq modus-themes-italic-constructs t
 	  modus-themes-bold-constructs nil)
 
     ;; Configure modus themes to toggle with the 'modus-themes-toggle' command
-    (setq modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi-tinted)))
-
-
-
-
+    (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
 
   ;; Keybinding to toggle between modus vivendi and modus operandi
 
