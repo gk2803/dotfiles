@@ -53,6 +53,8 @@ requires =cmake= and =libvterm-dev=
   (global-set-key (kbd "C-x k") 'kill-current-buffer)
   ;; denote keybindings
   (global-set-key (kbd "C-c M-j") 'denote-journal-extras-new-or-existing-entry)
+  ;; toggle modus-themes
+  (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
 #+end_src
 ** mode line
 #+begin_src emacs-lisp
@@ -123,16 +125,7 @@ requires =cmake= and =libvterm-dev=
     :init 
     (beacon-mode 1))
 #+end_src
-* Org 
-** Org Bullets Package
-prettifies org-mode 
-#+begin_src emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :defer t
-    :init
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
-#+end_src
+* Org
 ** source code edit 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c s") 'org-edit-src-code)
@@ -150,17 +143,14 @@ take care of the indentation and syntax highlight.  The default naming
 convention for python interpreter in org is ~python~. In that sense we
 use ~org-babel-python-command "python3"~ to  specify the name
 of the python interpreter on our system.
-#+begin_src emacs-lisp
-  (setq org-babel-python-command "python3")
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)))
-#+end_src
+
 In the same manner we can configure the ~/bin/bash~ codeblock
 #+begin_src emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((shell . t)))
+    (setq org-babel-python-command "python3")
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t) 
+       (shell . t)))
 #+end_src
 ** miscellaneous
 This is a keybinding for the ~org-store-link~ function that stores a
@@ -291,6 +281,14 @@ a gateway to our individual notes.
     (setq org-habit-show-all-today t)
     )
 
+#+end_src
+** Org Bullets Package
+prettifies org-mode 
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :after org
+    :hook (org-mode . org-bullets-mode))
 #+end_src
 * Vertico
 #+begin_src emacs-lisp
@@ -687,50 +685,50 @@ sunrise times and choose a theme accordingly.
 * Modus Themes
 change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
-
   (use-package modus-themes
-    :ensure t)
-  (require 'modus-themes)
-  (require 'solar)
+    :ensure t
+    :config
+    ;; configure modus themes
+    (setq modus-themes-italic-constructs t
+	  modus-themes-bold-constructs nil)
+
+    ;; Configure modus themes to toggle with the 'modus-themes-toggle' command
+    (setq modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi-tinted)))
 
 
-  ;; configure modus themes
-  (setq modus-themes-italic-constructs t
-	modus-themes-bold-constructs nil)
 
-  ;; Configure modus themes to toggle with the 'modus-themes-toggle' command
-  (setq modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi-tinted))
+
 
   ;; Keybinding to toggle between modus vivendi and modus operandi
-  (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
+
 
   ;; Function to convert current time to decimal representation
-  (defun current-time-to-decimal ()
-    "Return the current time as a floating point number where 18:30 is represented as 18.50."
-    (let* ((now (decode-time (current-time)))
-	   (hour (nth 2 now))
-	   (minute (nth 1 now)))
-      (+ hour (/ minute 60.0))))
+  ;; (defun current-time-to-decimal ()
+  ;;   "Return the current time as a floating point number where 18:30 is represented as 18.50."
+  ;;   (let* ((now (decode-time (current-time)))
+  ;; 	 (hour (nth 2 now))
+  ;; 	 (minute (nth 1 now)))
+  ;;     (+ hour (/ minute 60.0))))
 
-  ;; Function to get current date as a list 
-  (defun current-date()
-    "Return the current date as a list of (mont day year)."
-    (let* ((now (decode-time (current-time)))
-	   (month (nth 4 now))
-	   (day (nth 3 now))
-	   (year (nth 5 now)))
-      (list month day year)))
+  ;; ;; Function to get current date as a list 
+  ;; (defun current-date()
+  ;;   "Return the current date as a list of (mont day year)."
+  ;;   (let* ((now (decode-time (current-time)))
+  ;; 	 (month (nth 4 now))
+  ;; 	 (day (nth 3 now))
+  ;; 	 (year (nth 5 now)))
+  ;;     (list month day year)))
 
 
-  (setq my-sunrise-sunset (solar-sunrise-sunset (current-date)))
+  ;; (setq my-sunrise-sunset (solar-sunrise-sunset (current-date)))
 
-  ;; Load themes based on current time
-  (let ((sunrise (car (car my-sunrise-sunset)))
-	(sunset (car (cadr my-sunrise-sunset))))
-    (if (and (>=  (current-time-to-decimal) sunrise)
-	     (< (current-time-to-decimal) sunset))
-	(load-theme 'modus-operandi-tinted :no-confirm)
-      (load-theme 'modus-vivendi-tinted  :no-confirm)))
+  ;; ;; Load themes based on current time
+  ;; (let ((sunrise (car (car my-sunrise-sunset)))
+  ;;       (sunset (car (cadr my-sunrise-sunset))))
+  ;;   (if (and (>=  (current-time-to-decimal) sunrise)
+  ;; 	   (< (current-time-to-decimal) sunset))
+  ;;       (load-theme 'modus-operandi-tinted :no-confirm)
+  ;;     (load-theme 'modus-vivendi-tinted  :no-confirm)))
 #+end_src
 
 * RSS/Atom 
