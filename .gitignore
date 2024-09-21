@@ -1,8 +1,10 @@
 *
 
+
 !.gitignore
 !.emacs.d/config.org
 !.emacs.d/config.el
+!.emacs.d/init.el
 !bash/.bashrc
 !bspwm/bspwmrc
 !htop/htoprc
