@@ -662,13 +662,16 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
     :config
     (yas-global-mode 1))
 
-
 #+end_src
 * Diary
 First I want to change the directory of the diary file in order to
 allign with the rest of my note-taking workflow
 #+begin_src emacs-lisp
-  (setq diary-file "~/Nextcloud/org/diary")
+  (use-package diary
+    :ensure nil
+    :defer t
+    :init
+    (setq diary-file "~/Nextcloud/org/diary"))
 #+end_src
 * Calendar
 The main reason why I wanted to insert my location on emacs-calendar
@@ -875,6 +878,7 @@ emacs with libxml2 support.
 
   (use-package mu4e
     :ensure nil
+    :defer t
     ;; we do ensure nil because we are using the mu4e installed by the package manager
     ;; of our linux distribution
     ;; we might need to add a load path
