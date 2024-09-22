@@ -687,48 +687,49 @@ sunrise times and choose a theme accordingly.
 * Modus Themes
 change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
-  (use-package modus-themes
-    :ensure t
-    :demand t
-    :bind (("<f5>" . modus-themes-toggle))
-    :config
-    ;; configure modus themes
-    (setq modus-themes-italic-constructs t
-	  modus-themes-bold-constructs nil)
+    (use-package modus-themes
+      :ensure t
+      :demand t
+      :bind (("<f5>" . modus-themes-toggle)
+	     ("C-<f5>" . modus-themes-select))
+      :config
+      ;; configure modus themes
+      (setq modus-themes-italic-constructs t
+	    modus-themes-bold-constructs nil)
 
-    ;; Configure modus themes to toggle with the 'modus-themes-toggle' command
-    (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
+      ;; Configure modus themes to toggle with the 'modus-themes-toggle' command
+      (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
 
-  ;; Keybinding to toggle between modus vivendi and modus operandi
-
-
-  ;; Function to convert current time to decimal representation
-  ;; (defun current-time-to-decimal ()
-  ;;   "Return the current time as a floating point number where 18:30 is represented as 18.50."
-  ;;   (let* ((now (decode-time (current-time)))
-  ;; 	 (hour (nth 2 now))
-  ;; 	 (minute (nth 1 now)))
-  ;;     (+ hour (/ minute 60.0))))
-
-  ;; ;; Function to get current date as a list 
-  ;; (defun current-date()
-  ;;   "Return the current date as a list of (mont day year)."
-  ;;   (let* ((now (decode-time (current-time)))
-  ;; 	 (month (nth 4 now))
-  ;; 	 (day (nth 3 now))
-  ;; 	 (year (nth 5 now)))
-  ;;     (list month day year)))
+    ;; Keybinding to toggle between modus vivendi and modus operandi
 
 
-  ;; (setq my-sunrise-sunset (solar-sunrise-sunset (current-date)))
+    ;; Function to convert current time to decimal representation
+    ;; (defun current-time-to-decimal ()
+    ;;   "Return the current time as a floating point number where 18:30 is represented as 18.50."
+    ;;   (let* ((now (decode-time (current-time)))
+    ;; 	 (hour (nth 2 now))
+    ;; 	 (minute (nth 1 now)))
+    ;;     (+ hour (/ minute 60.0))))
 
-  ;; ;; Load themes based on current time
-  ;; (let ((sunrise (car (car my-sunrise-sunset)))
-  ;;       (sunset (car (cadr my-sunrise-sunset))))
-  ;;   (if (and (>=  (current-time-to-decimal) sunrise)
-  ;; 	   (< (current-time-to-decimal) sunset))
-  ;;       (load-theme 'modus-operandi-tinted :no-confirm)
-  ;;     (load-theme 'modus-vivendi-tinted  :no-confirm)))
+    ;; ;; Function to get current date as a list 
+    ;; (defun current-date()
+    ;;   "Return the current date as a list of (mont day year)."
+    ;;   (let* ((now (decode-time (current-time)))
+    ;; 	 (month (nth 4 now))
+    ;; 	 (day (nth 3 now))
+    ;; 	 (year (nth 5 now)))
+    ;;     (list month day year)))
+
+
+    ;; (setq my-sunrise-sunset (solar-sunrise-sunset (current-date)))
+
+    ;; ;; Load themes based on current time
+    ;; (let ((sunrise (car (car my-sunrise-sunset)))
+    ;;       (sunset (car (cadr my-sunrise-sunset))))
+    ;;   (if (and (>=  (current-time-to-decimal) sunrise)
+    ;; 	   (< (current-time-to-decimal) sunset))
+    ;;       (load-theme 'modus-operandi-tinted :no-confirm)
+    ;;     (load-theme 'modus-vivendi-tinted  :no-confirm)))
 #+end_src
 
 * RSS/Atom 
@@ -739,7 +740,7 @@ change the theme based on the sunset and sunrise times.
     :bind
     ("C-x e" . elfeed)
     :config
-    (setq elfeed-feeds '("https://protesilaos.com/master.xml" )))
+    (setq elfeed-feeds '("https://protesilaos.com/master.xml" "https://lyra.horse/blog/posts/index.xml")))  
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
