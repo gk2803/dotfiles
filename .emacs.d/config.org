@@ -846,8 +846,14 @@ emacs with libxml2 support.
 #+end_src
 ** Tree sitter
 #+begin_src emacs-lisp
-  (add-hook 'python-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'php-mode-hook #'tree-sitter-hl-mode)
+  (setq treesit-language-source-alist
+	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
+	  (cmake "https://github.com/tree-sitter/tree-sitter-cmake")
+	  (elisp "https://github.com/tree-sitter/tree-sitter-elisp") ;;this doesn't work
+	  (go "https://github.com/tree-sitter/tree-sitter-go")
+	  (html "https://github.com/tree-sitter/tree-sitter-html")
+	  (python "https://github.com/tree-sitter/tree-sitter-python")
+	  (rust "https://github.com/tree-sitter/tree-sitter-rust")))
 #+end_src
 * Company
 #+begin_src emacs-lisp
