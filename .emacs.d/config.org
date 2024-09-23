@@ -196,7 +196,7 @@ set org directory
 ** Capture
 First we create some =org-capture= templates in order to save our
 current Tasks, meetings, etc.  Those templates create the
-corresponding org files within the =~/org/= directory.  The
+corresponding org files within Org directory.  The
 =org-capture= files can be used as a mean to collect all of our
 captures coming from our individual note files.  Thus, instead of
 cluttering our workflow by pointing multiple individual note files to
@@ -204,9 +204,28 @@ cluttering our workflow by pointing multiple individual note files to
 a gateway to our individual notes. 
 
 #+begin_src emacs-lisp
-  ;; %?  is a placeholder for your cursor
-  ;; %i  is a placeholder for inserting selected text, or none if nothing is selected
-  ;; %a  is a placeholder for inserting a link to the location from the file that the capture was created
+  ;; '%?'  is a placeholder for your cursor
+
+  ;; '%i' is a placeholder for inserting selected region, or none if
+  ;; nothing is selected
+
+  ;; '%a' is a placeholder for inserting a link to the location from the
+  ;; file that the capture was created
+
+  ;; '%A' like '%a', but prompt for the description part
+
+  ;; '%l' like '%a', but only insert the literal link
+
+  ;; in the same manner
+  ;; '%t' Timestamp, date only
+
+  ;; '%T' Timestamp, date and time
+
+  ;; '%u', '%U', like '%t', '%T' above, but inactive timestamps
+
+  ;; '%^{PROMPT}' prompt the user for a string and replace this sequence
+  ;; with it.  You may specify a default value and a completion table with
+  ;; '%^{prompt|default_val_goes_first|completion2|completion3..}'
   (use-package org-capture
     :ensure nil
     :bind ("C-c c" . org-capture)
@@ -659,9 +678,10 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
-    :config
+    :config 
+    (setq yas-snippet-dirs (append yas-snippet-dirs
+				   '("~/Nextcloud/snippets/")))  
     (yas-global-mode 1))
-
 #+end_src
 * Diary
 First I want to change the directory of the diary file in order to
