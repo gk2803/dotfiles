@@ -527,7 +527,7 @@ we have something like ~2024-06-30 01:15~ to show the last modified time
     :ensure nil
     :commands (dired)
     :bind (:map dired-mode-map
-		("C-c p" . dired-preview-mode)) ;; toggles prot's preview-mode
+		("C-o" . dired-preview-mode)) ;; toggles prot's preview-mode
     :config
     (setq dired-recursive-copies 'always)
     (setq dired-recursive-deletes 'always)
