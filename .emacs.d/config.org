@@ -737,6 +737,7 @@ change the theme based on the sunset and sunrise times.
 
 * RSS/Atom 
 #+begin_src emacs-lisp
+<<<<<<< HEAD
   (use-package elfeed
     :ensure t
     :defer t
@@ -746,6 +747,16 @@ change the theme based on the sunset and sunrise times.
     (setq elfeed-feeds '("https://protesilaos.com/master.xml"
 			 "https://lyra.horse/blog/posts/index.xml"
 			 "http://www.masteringemacs.org/feed")))  
+=======
+    (use-package elfeed
+      :ensure t
+      :defer t
+      :bind
+      ("C-x e" . elfeed)
+      :config
+      (setq elfeed-feeds '("https://protesilaos.com/master.xml"
+			   "https://lyra.horse/blog/posts/index.xml")))  
+>>>>>>> 88d630a (refactoring rss fees)
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
