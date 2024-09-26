@@ -148,6 +148,7 @@ In the same manner we can configure the ~/bin/bash~ codeblock
    '((python . t) 
      (shell . t)
      (rust . t)))
+  (setq org-src-fontify-natively t)
   (use-package ob-rust
     :ensure t
     :defer t)
@@ -866,9 +867,11 @@ emacs with libxml2 support.
 *** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode
+    :ensure t
+    :defer t
     :mode "\\.rs\\'"
     :hook (rust-mode . lsp-deferred))
-  (add-to-list 'exec-path "~/.cargo/bin")
+
 #+end_src
 ** Tree sitter
 #+begin_src emacs-lisp
