@@ -906,8 +906,7 @@ emacs with libxml2 support.
     :config
     (setq clip2org-clippings-file "~/Downloads/My Clippings.txt"))
 #+end_src
-* email
-** mu4e
+* mu4e
 #+begin_src emacs-lisp
 
   (use-package mu4e
