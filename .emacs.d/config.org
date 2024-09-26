@@ -146,7 +146,11 @@ In the same manner we can configure the ~/bin/bash~ codeblock
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((python . t) 
-     (shell . t)))
+     (shell . t)
+     (rust . t)))
+  (use-package ob-rust
+    :ensure t
+    :defer t)
 #+end_src
 ** miscellaneous
 This is a keybinding for the ~org-store-link~ function that stores a
