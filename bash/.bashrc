@@ -128,7 +128,10 @@ export PATH="$PATH:~/.local/bin"
 # xfce4-terminal
 export PATH="$PATH:/usr/bin/"
 
+
 #export QSYS_ROOTDIR="/home/rqd3/intelFPGA_lite/23.1std/quartus/sopc_builder/bin"
+
+
 
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
