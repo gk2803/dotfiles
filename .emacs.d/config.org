@@ -906,6 +906,13 @@ emacs with libxml2 support.
     )
 
 #+end_src
+* htmlize
+#+begin_src emacs-lisp
+  (use-package htmlize
+  :load-path "~/.emacs.d/emacs-htmlize"
+  :defer t)
+#+end_src
+
 * Kindle
 #+begin_src emacs-lisp
   (use-package clip2org
