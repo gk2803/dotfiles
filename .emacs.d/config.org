@@ -836,6 +836,8 @@ emacs with libxml2 support.
 *** Language Server
 #+begin_src emacs-lisp
   (use-package lsp-mode
+    :ensure t
+    :defer t
     :commands (lsp lsp-deferred) ;; lsp mode gets loaded when lsp, lsp-deferred are triggered
     :init
     (setq lsp-keymap-prefix "C-c C-l")
@@ -844,8 +846,6 @@ emacs with libxml2 support.
     (setq read-process-output-max (* 1024 1024))
     (setq lsp-ui-sideline-enable nil))
 
-
-  ;; na allaksw to keybind
 #+end_src
 *** Python
 #+begin_src emacs-lisp
@@ -877,7 +877,7 @@ emacs with libxml2 support.
 #+begin_src emacs-lisp
   (setq treesit-language-source-alist
 	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
-	  (cmake "https://github.com/tree-sitter/tree-sitter-cmake")
+	  (c "https://github.com/tree-sitter/tree-sitter-c")
 	  (elisp "https://github.com/tree-sitter/tree-sitter-elisp") ;;this doesn't work
 	  (go "https://github.com/tree-sitter/tree-sitter-go")
 	  (html "https://github.com/tree-sitter/tree-sitter-html")
@@ -893,6 +893,7 @@ emacs with libxml2 support.
 * Company
 #+begin_src emacs-lisp
   (use-package company
+    :ensure t
     :after lsp-mode
     :hook (lsp-mode . company-mode)
     :bind (:map company-active-map
@@ -901,8 +902,7 @@ emacs with libxml2 support.
 	  ("<tab>" . company-indent-or-complete-common))
     :custom
     (company-minimum-prefix-length 1)
-    (company-idle-delay 0.0)  
-
+    (company-idle-delay 0.0)
     )
 
 #+end_src
