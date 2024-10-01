@@ -1,4 +1,7 @@
 *
+!.emacs.d/
+!.bash/
+!bspwm/
 !.gitignore
 !.emacs.d/config.org
 !bash/.bashrc
