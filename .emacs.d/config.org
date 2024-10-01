@@ -332,6 +332,8 @@ prettifies org-mode
     :ensure t
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind (;; C-c bindings in `mode-specific-map'
+	   ;; run a command from the current active major/minor - mode.
+	   ;; can narrow to local-minor/global-minor/major with the keys l/g/m
 	   ("C-c M-x" . consult-mode-command)
 	   ("C-x C-b". consult-buffer)
 	   ("M-s M-l". consult-line)
