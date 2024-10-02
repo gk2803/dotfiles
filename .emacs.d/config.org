@@ -380,8 +380,8 @@ called?
       :bind
       (:map global-map
 	    ("C-c n j" . denote-journal-extras-new-or-existing-entry)
-	    ("C-c n r" . my-denote-reference)
-	    ("C-c n f" . my-denote-fleeting)
+	    ("C-c n f" . my-denote-reference)
+	    ("C-c n i" . my-denote-fleeting)
 	    ("C-c n n" . my-denote-zk)
 	    ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
 	    )	  
