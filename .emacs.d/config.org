@@ -50,7 +50,8 @@ requires =cmake= and =libvterm-dev=
   (global-set-key (kbd "C-c e") 'end-of-buffer)
   (global-set-key (kbd "M--") 'count-words)
   (global-set-key (kbd "M-o") 'mode-line-other-buffer)
-  (global-set-key (kbd "C-x k") 'kill-current-buffer)  
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)
+  
 #+end_src
 ** mode line
 #+begin_src emacs-lisp
@@ -1048,3 +1049,13 @@ emacs with libxml2 support.
     (define-key global-map "\C-cv" 'tmr-tabulated-view)
     )
 #+end_src
+* isearch
+#+begin_src emacs-lisp
+  (use-package isearch
+    :ensure nil
+    :config
+    (setq isearch-lazy-count t)
+    (setq isearch-lazy-highlight t))
+
+#+end_src
+
