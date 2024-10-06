@@ -33,7 +33,7 @@
    '("https://www.reddit.com/r/Boxing/hot.rss" "reddit.com/r/boxing/.rss" "https://news.ycombinator.com/rss"))
  '(org-agenda-files nil)
  '(package-selected-packages
-   '(htmlize straight screenshot mu4e magit preview-latex laas Org-mode clip2org kindle-highlights-to-org lsp-ui rustic company python-ts-mode tree-sitter-langs tree-sitter lsp-pyright dired-preview org-anki php-mode anki-editor org-fc Org-fc multi-vterm vterm markdown-mode elfeed modus-themes yasnippet which-key vertico use-package spacemacs-theme org-bullets orderless marginalia lv embark-consult dired-sidebar denote cdlatex beacon auctex aas))
+   '(CDLaTeX til htmlize straight screenshot mu4e magit preview-latex laas Org-mode clip2org kindle-highlights-to-org lsp-ui rustic company python-ts-mode tree-sitter-langs tree-sitter lsp-pyright dired-preview org-anki php-mode anki-editor org-fc Org-fc multi-vterm vterm markdown-mode elfeed modus-themes yasnippet which-key vertico use-package spacemacs-theme org-bullets orderless marginalia lv embark-consult dired-sidebar denote cdlatex beacon auctex aas))
  '(package-vc-selected-packages
    '((anki-editor :url "https://github.com/anki-editor/anki-editor"))))
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))

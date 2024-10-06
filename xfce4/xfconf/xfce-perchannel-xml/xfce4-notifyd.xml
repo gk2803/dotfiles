@@ -6,6 +6,7 @@
       <value type="string" value="blueman"/>
       <value type="string" value="com.nextcloud.desktopclient.nextcloud"/>
       <value type="string" value="Firefox"/>
+      <value type="string" value="GNU Emacs"/>
       <value type="string" value="io.snapcraft.SessionAgent"/>
       <value type="string" value="nm-applet"/>
       <value type="string" value="org.freedesktop.network-manager-applet"/>

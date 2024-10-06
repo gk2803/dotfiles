@@ -837,7 +837,7 @@ change the theme based on the sunset and sunrise times.
       (setq elfeed-feeds '("https://protesilaos.com/master.xml"
 			   "https://lyra.horse/blog/posts/index.xml"
 			   "http://www.masteringemacs.org/feed"
-			   "https://antonispetrides.wordpress.com/feed")))
+			   "https://karthinks.com/index.xml")))
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
