@@ -430,12 +430,21 @@ called?
 	  For how the context is retrieved, see `my-denote-region-get-source-reference'."
       (interactive)
       (let ((context (my-denote-region-get-source-reference))
-	    (denote-directory "~/Nextcloud/Documents/publicNotes/"))
+	    (denote-directory "~/Nextcloud/Documents/publicNotes/")
+	    (denote-file-name-components-order '(signature title keywords identifier)))
 	(my-denote-region '(signature title keywords))
 	(when context
 	  (goto-char (point-max))
 	  (insert "\n")
 	  (insert context))))
+
+    (defun my-denote-region-zk ()
+      "Like `my-denote-region', but with the components order of `my-denote-zk'"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
+	    (denote-file-name-components-order '(signature title keywords identifier)))
+	(my-denote-region '(signature title keywords))))
 
     (defun my-denote-region-with-reference ()
       "Like `my-denote-region-with-reference-zk' but saved at references
@@ -497,7 +506,7 @@ called?
       (interactive)
       (let ((denote-file-name-components-order '(signature title keywords identifier)))
 	(call-interactively 'denote-rename-file-signature)))
-     
+
 
     ;; referecnce: 13. Keep a journal or diary
     ;; added org-anki-journal in the front matter 
@@ -674,7 +683,7 @@ check if we need to go further.
     (setq-default TeX-master nil)
     ;; set zathura as the default auctex pdf viewer
     (setq TeX-view-program-selection '((output-pdf "Zathura")))
-    ;; automatically insert the other pair of (,{,[
+    ;; automatically insert the other pair of a bracket
     (setq LaTeX-electric-left-right-brace t)
     (add-hook 'LaTeX-mode-hook
 	      (lambda () (setq-local TeX-electric-math
@@ -694,12 +703,8 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
 #+begin_src emacs-lisp
   (use-package laas
     :ensure t
-    :hook ((org-mode LaTeX-mode) . laas-mode)
+    :hook ( LaTeX-mode . laas-mode)
     :config ; do whatever here
-    (defun my-laas-beginning-of-line-condition()
-      "Return t if snippet key is at the beginning of line"
-      (interactive)
-      (looking-back "^dm" nil))
     (aas-set-snippets 'laas-mode 
       ;; set condition!
       :cond #'texmathp ;; expand only while in math
@@ -708,6 +713,8 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       "cup" '(yas "\\cup$1")
       "ceil" '(yas "\\lceil $1 \\rceil $0")
       "flr" '(yas "\\lfloor $1 \\rfloor $0")
+      "{}" '(yas "\\\\{ $1 \\\\}")
+      "mod" '(yas "\\mod $1")
       "cir" "\\circ " ;; composition
       "supp" "\\supp"
       "On" "O(n)"
@@ -726,9 +733,18 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))
       :cond (lambda() (not (texmathp))) ;;expand when not in math 
       "fm" '(yas "\\\\( $1 \\\\)")
-
       ))
 #+end_src
+** Cdlatex
+CdLaTeX is a minor mode that is normally used in combination with a
+major LaTeX mode like AUCTex.
+
+#+begin_src emacs-lisp
+  (use-package cdlatex
+    :ensure t
+    :defer t)
+#+end_src
+
 * YASnippet
 #+begin_src emacs-lisp
   (use-package yasnippet
@@ -812,15 +828,16 @@ change the theme based on the sunset and sunrise times.
 
 * RSS/Atom 
 #+begin_src emacs-lisp
-  (use-package elfeed
-    :ensure t
-    :defer t
-    :bind
-    ("C-x e" . elfeed)
-    :config
-    (setq elfeed-feeds '("https://protesilaos.com/master.xml"
-			 "https://lyra.horse/blog/posts/index.xml"
-			 "http://www.masteringemacs.org/feed")))
+    (use-package elfeed
+      :ensure t
+      :defer t
+      :bind
+      ("C-x e" . elfeed)
+      :config
+      (setq elfeed-feeds '("https://protesilaos.com/master.xml"
+			   "https://lyra.horse/blog/posts/index.xml"
+			   "http://www.masteringemacs.org/feed"
+			   "https://antonispetrides.wordpress.com/feed")))
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
