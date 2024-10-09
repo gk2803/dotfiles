@@ -51,7 +51,11 @@ requires =cmake= and =libvterm-dev=
   (global-set-key (kbd "M--") 'count-words)
   (global-set-key (kbd "M-o") 'mode-line-other-buffer)
   (global-set-key (kbd "C-x k") 'kill-current-buffer)
-  
+
+  ;; colored parenthesis
+  (use-package rainbow-delimiters
+    :ensure t)
+
 #+end_src
 ** mode line
 #+begin_src emacs-lisp
@@ -265,7 +269,7 @@ a gateway to our individual notes.
 	     :empty-lines-after 1)
 	    ("h" "Habits" entry
 	     (file+headline "tasks.org" "Habits")
-	     ,(concat "* TODO %^{Title}\n"
+	     ,(concat "* TODO %^{Title} %^g\n"
 		      "%^{|SCHEDULED}: %^t\n"
 		      ":PROPERTIES:\n"
 		      ":STYLE:    habit\n"
@@ -292,9 +296,83 @@ a gateway to our individual notes.
     :config
     (setq org-agenda-include-diary t)
     (setq org-agenda-files `(,org-directory))
+    ;; The value we will be editing for custom agenda view
+    ;; is `org-agenda-custom-commands'
 
+    (setq org-agenda-custom-commands
+	  `(("A" "Daily agenda and top priority tasks"
+	     ,my-org-custom-daily-agenda
+	     ((org-agenda-fontify-priorities nil)
+	      (org-agenda-prefix-format "	 %t %s")
+	      (org-agenda-dim-blocked-tasks nil)))
+	    ("P" "Plain text daily agenda and top priorities"
+	     ,my-org-custom-daily-agenda
+	     ((org-agenda-with-colors nil)
+	      (org-agenda-prefix-format "%t %s")
+	      (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
+	      (org-agenda-fontify-priorities nil)
+	      (org-agenda-remove-tags t))
+	     ("agenda.txt"))))
 
-
+    (defvar my-org-custom-daily-agenda
+  ;;
+  ;; tags-todo "+PRIORITY=\"A\""
+  ;;
+  ;; So we match everything and then skip entries with
+  ;; `org-agenda-skip-function'.
+  `((tags-todo "*"
+	       ((org-agenda-overriding-header "Important tasks without a date\n")
+		(org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
+		(org-agenda-skip-function
+		 `(org-agenda-skip-entry-if
+		   'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+		(org-agenda-block-separator nil)))
+    (agenda "" ((org-agenda-overriding-header "\nPending scheduled tasks")
+		(org-agenda-time-grid nil)
+		(org-agenda-start-on-weekday nil)
+		(org-agenda-span 1)
+		(org-agenda-show-all-dates nil)
+		(org-scheduled-past-days 365)
+		;; Excludes today's scheduled items
+		(org-scheduled-delay-days 1)
+		(org-agenda-block-separator nil)
+		(org-agenda-entry-types '(:scheduled))
+		(org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+		(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "ROUTINE"))
+		(org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+		(org-agenda-format-date "")))
+    (agenda "" ((org-agenda-overriding-header "\nToday's agenda\n")
+		(org-agenda-span 1)
+		(org-deadline-warning-days 0)
+		(org-agenda-block-separator nil)
+		(org-scheduled-past-days 0)
+		(org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "ROUTINE"))
+		;; We don't need the `org-agenda-date-today'
+		;; highlight because that only has a practical
+		;; utility in multi-day views.
+		(org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+		(org-agenda-format-date "%A %-e %B %Y")))
+    (agenda "" ((org-agenda-overriding-header "\nNext three days\n")
+		(org-agenda-start-on-weekday nil)
+		(org-agenda-start-day nil)
+		(org-agenda-start-day "+1d")
+		(org-agenda-span 3)
+		(org-deadline-warning-days 0)
+		(org-agenda-block-separator nil)
+		(org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+    (agenda "" ((org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")
+		(org-agenda-time-grid nil)
+		(org-agenda-start-on-weekday nil)
+		;; We don't want to replicate the previous section's
+		;; three days, so we start counting from the day after.
+		(org-agenda-start-day "+4d")
+		(org-agenda-span 14)
+		(org-agenda-show-all-dates nil)
+		(org-deadline-warning-days 0)
+		(org-agenda-block-separator nil)
+		(org-agenda-entry-types '(:deadline))
+		(org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done)))))
+  "Custom agenda for use in `org-agenda-custom-commands'.")
     ;; habits
     (require 'org-habit)
     (setq org-habit-graph-column 50)
@@ -383,8 +461,8 @@ called?
     :bind
     (:map global-map
 	  ("C-c n j" . denote-journal-extras-new-or-existing-entry)
-	  ("C-c n f" . my-denote-reference)
-	  ("C-c n i" . my-denote-fleeting)
+	  ("C-c n r" . my-denote-reference)
+	  ("C-c n i" . my-denote-inbox)
 	  ("C-c n n" . my-denote-zk)
 	  ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
 	  )	  
@@ -458,7 +536,7 @@ called?
 	  (insert "\n")
 	  (insert context))))
 
-    (defun my-denote-fleeting ()
+    (defun my-denote-inbox ()
       "Create a simple post note, something you might want to remember,
 	everything goes"
       (declare (interactive-only t))
