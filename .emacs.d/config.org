@@ -299,21 +299,6 @@ a gateway to our individual notes.
     ;; The value we will be editing for custom agenda view
     ;; is `org-agenda-custom-commands'
 
-    (setq org-agenda-custom-commands
-	  `(("A" "Daily agenda and top priority tasks"
-	     ,my-org-custom-daily-agenda
-	     ((org-agenda-fontify-priorities nil)
-	      (org-agenda-prefix-format "	 %t %s")
-	      (org-agenda-dim-blocked-tasks nil)))
-	    ("P" "Plain text daily agenda and top priorities"
-	     ,my-org-custom-daily-agenda
-	     ((org-agenda-with-colors nil)
-	      (org-agenda-prefix-format "%t %s")
-	      (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
-	      (org-agenda-fontify-priorities nil)
-	      (org-agenda-remove-tags t))
-	     ("agenda.txt"))))
-
     (defvar my-org-custom-daily-agenda
   ;;
   ;; tags-todo "+PRIORITY=\"A\""
@@ -373,6 +358,23 @@ a gateway to our individual notes.
 		(org-agenda-entry-types '(:deadline))
 		(org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done)))))
   "Custom agenda for use in `org-agenda-custom-commands'.")
+
+    (setq org-agenda-custom-commands
+	  `(("A" "Daily agenda and top priority tasks"
+	     ,my-org-custom-daily-agenda
+	     ((org-agenda-fontify-priorities nil)
+	      (org-agenda-prefix-format "	 %t %s")
+	      (org-agenda-dim-blocked-tasks nil)))
+	    ("P" "Plain text daily agenda and top priorities"
+	     ,my-org-custom-daily-agenda
+	     ((org-agenda-with-colors nil)
+	      (org-agenda-prefix-format "%t %s")
+	      (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
+	      (org-agenda-fontify-priorities nil)
+	      (org-agenda-remove-tags t))
+	     ("agenda.txt"))))
+
+
     ;; habits
     (require 'org-habit)
     (setq org-habit-graph-column 50)
@@ -468,12 +470,12 @@ called?
 	  )	  
     :config
     ;; set the order of denote naming scheme
-    (setq denote-file-name-components-order '(identifier signature title keywords ))      
+    (setq denote-file-name-components-order '(identifier signature title keywords ))
 
     ;; Variant of `my-denote-region' to reference the source
     (defun my-denote-region-get-source-reference ()
       "Get a reference to the source for use with `my-denote-region'.
-	The reference is a URL or an Org-formatted link to a file."
+			      The reference is a URL or an Org-formatted link to a file."
       ;; We use a `cond' here because we can extend it to cover more
       ;; cases.
       (cond
@@ -486,7 +488,7 @@ called?
 
     (defun my-denote-region (&optional lst)
       "Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
-      If LST is not provided, use the default list '(title signature)."
+			    If LST is not provided, use the default list '(title signature)."
       (declare (interactive-only t))
       (interactive)
       (let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
@@ -505,7 +507,7 @@ called?
 
     (defun my-denote-region-with-reference-zk ()
       "Like `denote-region', but add the context afterwards.
-	  For how the context is retrieved, see `my-denote-region-get-source-reference'."
+				For how the context is retrieved, see `my-denote-region-get-source-reference'."
       (interactive)
       (let ((context (my-denote-region-get-source-reference))
 	    (denote-directory "~/Nextcloud/Documents/publicNotes/")
@@ -526,7 +528,7 @@ called?
 
     (defun my-denote-region-with-reference ()
       "Like `my-denote-region-with-reference-zk' but saved at references
-      and has no signature"
+			    and has no signature"
       (interactive)
       (let ((context (my-denote-region-get-source-reference))
 	    (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
@@ -538,7 +540,7 @@ called?
 
     (defun my-denote-inbox ()
       "Create a simple post note, something you might want to remember,
-	everything goes"
+			      everything goes"
       (declare (interactive-only t))
       (interactive)
       (let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
@@ -560,7 +562,7 @@ called?
 
     (defun my-denote-reference ()
       "Create a reference note"
-      (declare (interactive-only-t))
+      (declare (interactive-only t))
       (interactive)
       (let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
 	    (denote-infer-keywords nil)
@@ -586,7 +588,7 @@ called?
 	(call-interactively 'denote-rename-file-signature)))
 
 
-    ;; referecnce: 13. Keep a journal or diary
+    ;; reference: 13. Keep a journal or diary
     ;; added org-anki-journal in the front matter 
     (defun my-denote-tech-journal-new-or-existing-entry()
       "Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
@@ -594,7 +596,48 @@ called?
       (let ((denote-journal-extras-keyword "techjournal")
 	    (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
 	    (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n")))
-	(call-interactively 'denote-journal-extras-new-or-existing-entry))))  
+	(call-interactively 'denote-journal-extras-new-or-existing-entry)))
+
+
+
+    ;; shell file type configuration
+    ;; `denote-file-type' is an alist that holds the configuration options
+    ;; of every denote associated extension
+    ;; see https://protesilaos.com/codelog/2022-10-30-demo-denote-custom-file-type/
+
+
+
+    (add-to-list 'denote-file-types '(latex
+				      :extension ".tex"
+				      :date-function denote-date-org-timestamp
+				      :front-matter my-denote-latex-front-matter
+				      :title-key-regexp "^% title\\s-*:"
+				      :title-value-function identity
+				      :title-value-reverse-function denote-trim-whitespace
+				      :keywords-key-regexp "^% tags\\s-*:"
+				      :keywords-value-function denote-format-keywords-for-org-front-matter
+				      :keywords-value-reverse-function denote-extract-keywords-from-front-matter
+				      :link denote-org-link-format
+				      :link-in-context-regexp denote-org-link-in-context-regexp))
+
+    (defun my-denote-thesis-journal-new-or-existing-entry()
+      "Like `denote-journal-extras-new-or-existing-entry' using the corresponding thesis journal directory instead"
+      (interactive)
+      (let ((denote-journal-extras-keyword "thesisjournal")
+	    (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/thesis journal")
+	    (denote-file-type "latex")
+	    )
+	(call-interactively 'denote-journal-extras-new-or-existing-entry)))
+
+
+    (defvar my-denote-latex-front-matter
+      "%% title:      %s
+  %% date:       %s
+  %% tags:       %s
+  %% identifier: %s
+    \n")
+
+    )  
 
 
 #+end_src
@@ -751,29 +794,33 @@ check if we need to go further.
 ** Auctex
 #+begin_src emacs-lisp
   (use-package auctex
-    :ensure t
-    :defer t
-    :mode ("\\.tex\\'" . LaTeX-mode)
+    :ensure t    
     :config
     (setq TeX-auto-save t)
     (setq TeX-parse-self t)
     ;; if you often use \include or \input, make AUCTEX aware of the multifile doc structure
-    (setq-default TeX-master nil)
+    ;; https://www.gnu.org/software/auctex/manual/auctex/Multifile.html
+    ;;(setq-default TeX-master nil)		
     ;; set zathura as the default auctex pdf viewer
     (setq TeX-view-program-selection '((output-pdf "Zathura")))
+    (setq LaTeX-default-options "a4paper,12pt,draft")
     ;; automatically insert the other pair of a bracket
-    (setq LaTeX-electric-left-right-brace t)
+    ;;(setq LaTeX-electric-left-right-brace nil)
     (add-hook 'LaTeX-mode-hook
-	      (lambda () (setq-local TeX-electric-math
-				     (cons "$" "$")))))
+	      (lambda () (setq-local company-backends
+		'((company-auctex-macros company-auctex-symbols company-auctex-environments)
+		  company-auctex-bibs company-auctex-labels company-files)))))
+
+
 #+end_src
-** Company Auctex
+** Company Auctex backend
 #+begin_src emacs-lisp
   (use-package company-auctex
     :ensure t
-    :after (company auctex)
+    :after (company)
     :config
-    (company-auctex-init))
+      (company-auctex-init)
+    )
 #+end_src
 ** LaTeX-auto-activating-snippets
 This package need to have ~aas~ installed as well.
@@ -820,7 +867,8 @@ major LaTeX mode like AUCTex.
 #+begin_src emacs-lisp
   (use-package cdlatex
     :ensure t
-    :defer t)
+    :defer t
+)
 #+end_src
 
 * YASnippet
@@ -1043,17 +1091,18 @@ emacs with libxml2 support.
 * Company
 #+begin_src emacs-lisp
   (use-package company
-    :ensure t
-    :after lsp-mode
-    :hook (lsp-mode . company-mode)
+    :ensure t      
+    :hook (lsp-mode LaTeX-mode)
     :bind (:map company-active-map
 		("<tab>" . company-complete-selection))
-    (:map lsp-mode-map
-	  ("<tab>" . company-indent-or-complete-common))
-    :custom
+    ;; (:map lsp-mode-map
+    ;; 	("<tab>" . company-indent-or-complete-common))
+    :custom   
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0)
+    
     )
+
 
 #+end_src
 * htmlize
@@ -1164,5 +1213,14 @@ emacs with libxml2 support.
     (setq isearch-lazy-count t)
     (setq isearch-lazy-highlight t))
 
+#+end_src
+* mydict
+#+begin_src emacs-lisp
+  (use-package dict
+    :ensure nil
+    :load-path "my-dict"
+    :bind
+    ("C-c d d" . my-dict-insert-word)
+    )
 #+end_src
 
