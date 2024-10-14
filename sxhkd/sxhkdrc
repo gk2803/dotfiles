@@ -8,7 +8,7 @@ super + shift + f
 	
 #emacs
 super + e
-      emacs      
+      bash -ic emacs
       
 # terminal
 super + Return
