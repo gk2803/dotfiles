@@ -1,6 +1,6 @@
 #launch filesystem
-super + shift + t
-      thunar
+#super + shift + t
+#      thunar
 
 # launch firefox
 super + shift + f
