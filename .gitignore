@@ -11,5 +11,4 @@
 !polybar/launch.sh
 !rofi/config.rasi
 !sxhkd/sxhkdrc
-!xfce4
-
+!darkman/*
