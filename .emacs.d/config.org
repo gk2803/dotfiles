@@ -1,4 +1,4 @@
-* Terminal
+* terminal
 requires =cmake= and =libvterm-dev=
 #+begin_src emacs-lisp
   (use-package vterm
@@ -12,7 +12,7 @@ requires =cmake= and =libvterm-dev=
   (use-package which-key
     :ensure t
     :init
-    (which-key-mode)) ;;ensure t makes sure this package is installed
+    (which-key-mode)) 
 #+end_src
 * miscellaneous
 #+begin_src emacs-lisp
@@ -32,7 +32,7 @@ requires =cmake= and =libvterm-dev=
   ;; no tool bar, menu bar, scroll bar
   (tool-bar-mode -1) 
   (menu-bar-mode -1) 
-  (scroll-bar-mode -1)
+
 
   ;; startup message
   (setq inhibit-startup-message t)
@@ -62,18 +62,25 @@ requires =cmake= and =libvterm-dev=
 * Org
 #+begin_src emacs-lisp
   (use-package org
-    :ensure nil
+    :load-path "~/.emacs.d/elpa/org-mode/lisp/"
+    :ensure t
     :bind (("C-c r" . org-anki-sync-entry))
     :config
     (setq org-babel-python-command "python3")
     (setq org-directory "~/Nextcloud/org")
+    (setq fill-collumn 120)
     (setq org-src-fontify-natively t)
+    
     (setq org-id-link-to-org-use-id t) ;; sets a unique custom id property under header when `org-store-link' is invoked
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t) 
        (shell . t)
        (rust . t)))
+    
+    ;; org anki
+    (setq org-anki-default-note-type "Basic (and reversed card)")
+    
     (defun toggle-org-hide-emphasis-markers ()
       "Toggle value of org=hide-emphasis-markers`"
       (interactive)
@@ -81,8 +88,6 @@ requires =cmake= and =libvterm-dev=
       (org-mode-restart))
     )
 #+end_src
-
-
 ** language evaluation
 this is used in order to evaluate python code inside a block.
 Example: we press ~C-c C-,~ in order to invoke the
@@ -116,28 +121,7 @@ link that can be later used by the ~org-insert-link~ function
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c l") 'org-store-link)
 #+end_src
-When reaching the 80 character limit in a org-mode file then the line
-will automatically change
-#+begin_src emacs-lisp
-  (add-hook 'org-mode-hook (lambda ()
-			     (setq fill-collumn 120)
-			     (auto-fill-mode 1)))
-#+end_src
 
-open link at the current buffer: [[https://emacs.stackexchange.com/questions/69706/how-to-open-a-file-from-an-org-link-within-current-window][stack]]
-
-#+begin_src emacs-lisp
-  (defun mda/org-open-current-window ()                                              
-    "Opens file in current window."                                                  
-    (interactive)                                                                    
-    (let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
-      (org-open-at-point)))                  
-  (define-key global-map (kbd "C-c C-o") #'mda/org-open-current-window)   
-#+end_src
-
-#+begin_src emacs-lisp
-  
-#+end_src
 ** latex config
 #+begin_src emacs-lisp
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
@@ -331,6 +315,15 @@ prettifies org-mode
     :after org
     :hook (org-mode . org-bullets-mode))
 #+end_src
+** org habits stats
+#+begin_src emacs-lisp
+  (use-package org-habit-stats
+    :ensure)
+
+
+
+#+end_src
+
 * Vertico
 #+begin_src emacs-lisp
   ;; Vertico
@@ -399,145 +392,145 @@ called?
 3. The function, =my-denote-region= is my version of the function
    =denote-region= which adds also prompts for a signature.
 #+begin_src emacs-lisp
-    (use-package denote
-      :ensure t
-      :init
-      (setq denote-directory '"~/Nextcloud/Documents/publicNotes")
-      :bind
-      (:map global-map
-	    ("C-c n j" . denote-journal-extras-new-or-existing-entry)
-	    ("C-c n r" . my-denote-reference)
-	    ("C-c n i" . my-denote-inbox)
-	    ("C-c n n" . my-denote-zk)
-	    ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
-	    )	  
-      :config
-      ;; set the order of denote naming scheme
-      (setq denote-file-name-components-order '(identifier signature title keywords ))
+  (use-package denote
+    :ensure t
+    :init
+    (setq denote-directory '"~/Nextcloud/Documents/publicNotes")
+    :bind
+    (:map global-map
+	  ("C-c n j" . denote-journal-extras-new-or-existing-entry)
+	  ("C-c n r" . my-denote-reference)
+	  ("C-c n i" . my-denote-inbox)
+	  ("C-c n n" . my-denote-zk)
+	  ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
+	  )	  
+    :config
+    ;; set the order of denote naming scheme
+    (setq denote-file-name-components-order '(identifier signature title keywords ))
 
-      ;; Variant of `my-denote-region' to reference the source
-      (defun my-denote-region-get-source-reference ()
-	"Get a reference to the source for use with `my-denote-region'.
-	 The reference is a URL or an Org-formatted link to a file."
-	;; We use a `cond' here because we can extend it to cover more
-	;; cases.
-	(cond
-	 ((derived-mode-p 'eww-mode)
-	  (plist-get eww-data :url))
-	 ;; Here we are just assuming an Org format.  We can make this more
-	 ;; involved, if needed.
-	 (buffer-file-name
-	  (format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
+    ;; Variant of `my-denote-region' to reference the source
+    (defun my-denote-region-get-source-reference ()
+      "Get a reference to the source for use with `my-denote-region'.
+       The reference is a URL or an Org-formatted link to a file."
+      ;; We use a `cond' here because we can extend it to cover more
+      ;; cases.
+      (cond
+       ((derived-mode-p 'eww-mode)
+	(plist-get eww-data :url))
+       ;; Here we are just assuming an Org format.  We can make this more
+       ;; involved, if needed.
+       (buffer-file-name
+	(format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
 
-      (defun my-denote-region (&optional lst)
-	"Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
-			      If LST is not provided, use the default list '(title signature)."
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
-	  (if-let (((region-active-p)) 
-		   ;; Capture the text early, otherwise it will be empty
-		   ;; the moment `insert` is called.
-		   (text (buffer-substring-no-properties (region-beginning) (region-end))))
-	      (progn
-		(let ((denote-ignore-region-in-denote-command t))
-		  (call-interactively #'denote))
-		(push-mark (point))
-		(insert text)
-		(run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
-	    ;; If no region is active, just call `denote` with the prompt list.
-	    (call-interactively #'denote))))
+    (defun my-denote-region (&optional lst)
+      "Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
+			    If LST is not provided, use the default list '(title signature)."
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
+	(if-let (((region-active-p)) 
+		 ;; Capture the text early, otherwise it will be empty
+		 ;; the moment `insert` is called.
+		 (text (buffer-substring-no-properties (region-beginning) (region-end))))
+	    (progn
+	      (let ((denote-ignore-region-in-denote-command t))
+		(call-interactively #'denote))
+	      (push-mark (point))
+	      (insert text)
+	      (run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
+	  ;; If no region is active, just call `denote` with the prompt list.
+	  (call-interactively #'denote))))
 
-      (defun my-denote-region-with-reference-zk ()
-	"Like `denote-region', but add the context afterwards.
-				  For how the context is retrieved, see `my-denote-region-get-source-reference'."
-	(interactive)
-	(let ((context (my-denote-region-get-source-reference))
-	      (denote-directory "~/Nextcloud/Documents/publicNotes/")
-	      (denote-file-name-components-order '(signature title keywords identifier)))
-	  (my-denote-region '(signature title keywords))
-	  (when context
-	    (goto-char (point-max))
-	    (insert "\n")
-	    (insert context))))
+    (defun my-denote-region-with-reference-zk ()
+      "Like `denote-region', but add the context afterwards.
+				For how the context is retrieved, see `my-denote-region-get-source-reference'."
+      (interactive)
+      (let ((context (my-denote-region-get-source-reference))
+	    (denote-directory "~/Nextcloud/Documents/publicNotes/")
+	    (denote-file-name-components-order '(signature title keywords identifier)))
+	(my-denote-region '(signature title keywords))
+	(when context
+	  (goto-char (point-max))
+	  (insert "\n")
+	  (insert context))))
 
-      (defun my-denote-zk ()
-	"Like `denote', but with the prompts order of `my-denote-zk'"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
-	      (denote-file-name-components-order '(signature title keywords identifier))
-	      (denote-prompts '(signature title keywords)))
-	  (call-interactively 'denote)))
+    (defun my-denote-zk ()
+      "Like `denote', but with the prompts order of `my-denote-zk'"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
+	    (denote-file-name-components-order '(signature title keywords identifier))
+	    (denote-prompts '(signature title keywords)))
+	(call-interactively 'denote)))
 
-      (defun my-denote-region-with-reference-reference ()
-	"Like `my-denote-region-with-reference-zk' but saved as a `reference'
-	 and has no signature"
-	(interactive)
-	(let ((context (my-denote-region-get-source-reference))
-	      (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
-	  (my-denote-region '(title keywords))
-	  (when context
-	    (goto-char (point-max))
-	    (insert "\n")
-	    (insert context))))
+    (defun my-denote-region-with-reference-reference ()
+      "Like `my-denote-region-with-reference-zk' but saved as a `reference'
+       and has no signature"
+      (interactive)
+      (let ((context (my-denote-region-get-source-reference))
+	    (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
+	(my-denote-region '(title keywords))
+	(when context
+	  (goto-char (point-max))
+	  (insert "\n")
+	  (insert context))))
 
-      (defun my-denote-inbox ()
-	"Create a simple post note, something you might want to remember,
-	 everything goes"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("fleeting"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
+    (defun my-denote-inbox ()
+      "Create a simple post note, something you might want to remember,
+       everything goes"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
+	    (denote-infer-keywords nil)
+	    (denote-known-keywords '("fleeting"))
+	    (denote-prompts '(title keywords)))
+	(call-interactively 'denote)))
 
 
-      (defun my-denote-reference ()
-	"Create a reference note"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("reference" "book"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
+    (defun my-denote-reference ()
+      "Create a reference note"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
+	    (denote-infer-keywords nil)
+	    (denote-known-keywords '("reference" "book"))
+	    (denote-prompts '(title keywords)))
+	(call-interactively 'denote)))
 
-      (defun my-denote-curated ()
-	"Create a curated Note, a well established thought, an article"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("curated"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
+    (defun my-denote-curated ()
+      "Create a curated Note, a well established thought, an article"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
+	    (denote-infer-keywords nil)
+	    (denote-known-keywords '("curated"))
+	    (denote-prompts '(title keywords)))
+	(call-interactively 'denote)))
 
-      (defun my-denote-rename-file-signature ()
-	"rename file using the naming convention I use on my zk notes"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-file-name-components-order '(signature title keywords identifier)))
-	  (call-interactively 'denote-rename-file-signature)))
+    (defun my-denote-rename-file-signature ()
+      "rename file using the naming convention I use on my zk notes"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-file-name-components-order '(signature title keywords identifier)))
+	(call-interactively 'denote-rename-file-signature)))
 
-      ;; reference: 13. Keep a journal or diary
-      ;; added org-anki-journal in the front matter 
-      (defun my-denote-tech-journal-new-or-existing-entry()
-	"Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
-	(interactive)
-	(let ((denote-journal-extras-keyword "techjournal")
-	      (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-	      (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n\n* Anki Headers\n\n* Journal")))
-	  (call-interactively 'denote-journal-extras-new-or-existing-entry)))
+    ;; reference: 13. Keep a journal or diary
+    ;; added org-anki-journal in the front matter 
+    (defun my-denote-tech-journal-new-or-existing-entry()
+      "Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
+      (interactive)
+      (let ((denote-journal-extras-keyword "techjournal")
+	    (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
+	    (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n\n* Anki Headers\n\n* Journal")))
+	(call-interactively 'denote-journal-extras-new-or-existing-entry)))
 
-      ;; shell file type configuration
-      ;; `denote-file-type' is an alist that holds the configuration options
-      ;; of every denote associated extension
-      ;; see https://protesilaos.com/codelog/2022-10-30-demo-denote-custom-file-type/
+    ;; shell file type configuration
+    ;; `denote-file-type' is an alist that holds the configuration options
+    ;; of every denote associated extension
+    ;; see https://protesilaos.com/codelog/2022-10-30-demo-denote-custom-file-type/
 
-      (setq denote-commands-for-new-notes '(denote my-denote-zk my-denote-reference))
-      )  
+    (setq denote-commands-for-new-notes '(denote my-denote-zk my-denote-reference))
+    )  
 
 
 #+end_src
@@ -706,72 +699,77 @@ check if we need to go further.
     (setq TeX-source-correlate-start-server t)
     (setq LaTeX-default-options "a4paper,12pt,draft")
     ;; automatically insert the other pair of a bracket
-    ;;(setq LaTeX-electric-left-right-brace nil)
-    (add-hook 'LaTeX-mode-hook
-	      (lambda () (setq-local company-backends
-				     '((company-auctex-macros company-auctex-symbols company-auctex-environments)
-				       company-auctex-bibs company-auctex-labels company-files))))
-    ;; update pdf tools buffer 
+    (setq LaTeX-electric-left-right-brace nil)
+
+    ;; no prettified SHIT
+    (setq font-latex-fontify-script nil)
+    (setq font-latex-math-environments nil)
+    ;; update pdf tools buffer
     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)) 
-#+end_src
-** Company Auctex backend
-#+begin_src emacs-lisp
-  (use-package company-auctex
-    :ensure t
-    :after (company)
-    :config
-    (company-auctex-init)
-    )
 #+end_src
 ** LaTeX-auto-activating-snippets
 This package need to have ~aas~ installed as well.
 https://github.com/tecosaur/LaTeX-auto-activating-snippets
 #+begin_src emacs-lisp
-    (use-package laas
-      :ensure t
-      :hook (( LaTeX-mode . laas-mode)
-	     (org-mode . laas-mode))
-    
-      :config ; do whatever here
-      (aas-set-snippets 'laas-mode 
-			;; set condition!
-			:cond #'texmathp ;; expand only while in math
-			"lim" '(yas "\\lim_{x\\to\\infty} $0")
-			"cap" '(yas "\\cap$1")		      
-			"cup" '(yas "\\cup$1")
-			"ceil" '(yas "\\lceil $1 \\rceil $0")
-			"flr" '(yas "\\lfloor $1 \\rfloor $0")
-			"{}" '(yas "\\\\{ $1 \\\\}")
-			"mod" '(yas "\\mod $1")
-			"cir" "\\circ " ;; composition
-			"supp" "\\supp"
-			"On" "O(n)"
-			"O1" "O(1)"
-			"Olog" "O(\\log n)"
-			"Olon" "O(n \\log n)"
-			";;{" " \\subseteq "
-			"sq" '(yas "\\sqrt{$1} $0")		      
-			;; bind to functions!
-			"Sum" (lambda () (interactive)
-				(yas-expand-snippet "\\sum_{n=$1}^{$2} $0"))
-			"Span" (lambda () (interactive)
-				 (yas-expand-snippet "\\Span($1)$0"))
-			;; add accent snippets
-			:cond #'laas-object-on-left-condition
-			"qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))
-			:cond (lambda() (not (texmathp))) ;;expand when not in math 
-			"fm" '(yas "\\\\( $1 \\\\)")
-			))
+  (use-package laas
+    :ensure t
+    :hook (( LaTeX-mode . laas-mode)
+	   (org-mode . laas-mode))
+
+    :config ; do whatever here
+    (aas-set-snippets 'laas-mode 
+      ;; set condition!
+      :cond #'texmathp ;; expand only while in math
+      "lim" '(yas "\\lim_{x\\to\\infty} $0")
+      "cap" '(yas "\\cap$1")		      
+      "cup" '(yas "\\cup$1")
+      "ceil" '(yas "\\lceil $1 \\rceil $0")
+      "flr" '(yas "\\lfloor $1 \\rfloor $0")
+      "mod" '(yas "\\mod $1")
+      "cir" "\\circ " ;; composition
+      ";;x" "\\oplus"
+      "supp" "\\supp"
+      "On" "O(n)"
+      "O1" "O(1)"
+      ":=" "\\coloneqq"
+      "Olog" "O(\\log n)"
+      "Olon" "O(n \\log n)"
+      ";;{" " \\subseteq "
+      "sq" '(yas "\\sqrt{$1} $0")		      
+      ;; bind to functions!
+      "Sum" (lambda () (interactive)
+	      (yas-expand-snippet "\\sum_{n=$1}^{$2} $0"))
+      "Prod" (lambda () (interactive)
+	       (yas-expand-snippet "\\prod_{$1}^{$2} $0"))
+      "Span" (lambda () (interactive)
+	       (yas-expand-snippet "\\Span($1)$0"))
+      ;; add accent snippets
+      :cond #'laas-object-on-left-condition
+      "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))
+      :cond (lambda() (not (texmathp))) ;;expand when not in math 
+      "fm" '(yas "\\\\( $1 \\\\)")
+      "cpp" '(yas "\\cp{P}")
+      "cpv" '(yas "\\cp{V}")
+      ))
 #+end_src
 ** Cdlatex
 CdLaTeX is a minor mode that is normally used in combination with a
 major LaTeX mode like AUCTex.
-
 #+begin_src emacs-lisp
   (use-package cdlatex
     :ensure t
-    :hook (LaTeX-mode)
-    :defer t)
+    ;;      :hook (LaTeX-mode)
+    :defer t
+    :config
+    (setq cdlatex-takeover-parenthesis nil)
+    (setq cdlatex-paired-parens nil))
+#+end_src
+** lsp-latex
+#+begin_src emacs-lisp
+  (use-package lsp-latex
+    :ensure t
+    :hook((tex-mode . lsp)
+  	(LaTeX-mode . lsp)))
 #+end_src
 
 * YASnippet
@@ -831,7 +829,7 @@ change the theme based on the sunset and sunrise times.
       (modus-themes-load-theme 'modus-operandi))
 
 
-      (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
+    (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
 #+end_src
 
 * RSS/Atom 
@@ -881,11 +879,6 @@ emacs with libxml2 support.
     :config
     (setq markdown-fontify-code-blocks-natively t))
 #+end_src
-* Anki-editor
-#+begin_src emacs-lisp
-  (use-package org-anki
-    :ensure t)
-#+end_src
 * Development
 ** Languages
 *** Language Server
@@ -904,28 +897,28 @@ emacs with libxml2 support.
 #+end_src
 *** Python
 #+begin_src emacs-lisp
-    (use-package python-mode
-      :mode "\\.py\\'"
-      :hook (python-mode . lsp)
-      :config
-      (setq python-indent-offset 4)
-      (setq compilation-ask-about-save nil))
+  (use-package python-mode
+    :mode "\\.py\\'"
+    :hook (python-mode . lsp)
+    :config
+    (setq python-indent-offset 4)
+    (setq compilation-ask-about-save nil))
 
-    (use-package envrc
-      :ensure t
-      :hook (after-init . envrc-global-mode))
+  (use-package envrc
+    :ensure t
+    :hook (after-init . envrc-global-mode))
 
-    (use-package pyvenv
-      :ensure t
-      :config
-      (pyvenv-mode 1))
-  
-    (use-package lsp-pyright
+  (use-package pyvenv
+    :ensure t
+    :config
+    (pyvenv-mode 1))
+
+  (use-package lsp-pyright
     :ensure t
     :custom (lsp-pyright-langserver-command "pyright") ;; or basedpyright
     :hook (python-mode . (lambda ()
-			    (require 'lsp-pyright)
-			    (lsp))))  ; or lsp-deferred
+			   (require 'lsp-pyright)
+			   (lsp))))  ; or lsp-deferred
 
 #+end_src
 *** Php
@@ -936,6 +929,28 @@ emacs with libxml2 support.
     :config
     (setq php-indent-level 4))
 #+end_src
+*** Java
+#+begin_src emacs-lisp
+  (use-package lsp-java
+    :ensure t
+    :defer t
+    :config
+    (add-hook 'java-mode-hook #'lsp-deferred)
+    (setq lsp-java-format-on-type-enabled nil)
+    (setq lsp-enable-on-type-formatting nil)    
+    )
+  (use-package dap-mode
+    :ensure t
+    :defer t
+    :after lsp-mode
+    :config (dap-auto-configure-mode))
+  (use-package dap-java
+    :ensure nil)
+
+
+
+#+end_src
+
 *** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode
@@ -1098,7 +1113,7 @@ emacs with libxml2 support.
     :bind
     ("C-c d d" . my-dict-insert-word)
     :config
-    (setq my-dict-filename "~/Nextcloud/Notes/languages/english.org")
+    (setq my-dict-filename "~/Nextcloud/Notes/languages/english/english.org")
     )
 #+end_src
 
@@ -1154,8 +1169,8 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
 					   "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
 					   ("-d" "el_GR") nil iso-8859-7)
 					  ("greek"
-						   "[[:alpha:]]" "[^[A-Za-z]]" "[']" nil
-						   ("-d" "el_GR_UTF8") nil utf-8)))
+					   "[[:alpha:]]" "[^[A-Za-z]]" "[']" nil
+					   ("-d" "el_GR_UTF8") nil utf-8)))
     ;; new variable `ispell-hunspell-dictionary-alist' is defined in Emacs
     ;; If it's nil, Emacs tries to automatically set up the dictionaries.
 
@@ -1175,49 +1190,70 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
 
 * Window
 #+begin_src emacs-lisp
-    (setq display-buffer-alist
-	'(
-	  ;; ;; matcher can be a regexp that matches the buffers name as shown bellow
-	  ;; ("\\*Python\\*"
-	  ;;  ;; list of display functions
-	  ;;  (display-buffer-reuse-mode-window display-buffer-below-selected)
-	  ;;  ;; (PARAMETER . VALUE)
-	  ;;  (window-height . fit-to-window) ;;fit buffer to the size of the window
-	  ;;  (dedicated . t)
-	  ;;  )
+  (setq display-buffer-alist
+        '(
+    	;; ;; matcher can be a regexp that matches the buffers name as shown bellow
+    	;; ("\\*Python\\*"
+    	;;  ;; list of display functions
+    	;;  (display-buffer-reuse-mode-window display-buffer-below-selected)
+    	;;  ;; (PARAMETER . VALUE)
+    	;;  (window-height . fit-to-window) ;;fit buffer to the size of the window
+    	;;  (dedicated . t)
+    	;;  )
 
-	  ;; matcher can also be a major mode
-	  ((or . (( derived-mode . compilation-mode)
-                          (derived-mode . inferior-python-mode))) 
-  
+    	;; matcher can also be a major mode
+    	((or . (( derived-mode . compilation-mode)
+    		(derived-mode . inferior-python-mode))) 
+    	 (display-buffer-reuse-mode-window display-buffer-below-selected)
+    	 ;; (PARAMETER . VALUE)
+    	 (window-height . fit-to-window) ;;fit buffer to the size of the window
+    	 (dedicated . t))
+  	))
 
-	   (display-buffer-reuse-mode-window display-buffer-below-selected)
-	   ;; (PARAMETER . VALUE)
-	   (window-height . fit-to-window) ;;fit buffer to the size of the window
-	   (dedicated . t)
-	   )
-	))
+  ;; windows keys
+  ;; Keybindings for window management
+  (define-key global-map (kbd "C-x C-n") 'next-buffer)
+  (define-key global-map (kbd "C-x C-p") 'previous-buffer)
+  (define-key global-map (kbd "C-x !") 'delete-other-windows-vertically)
+  (define-key global-map (kbd "C-x _") 'balance-windows)
+  (define-key global-map (kbd "C-x }") 'enlarge-window)
+  (define-key global-map (kbd "C-x {") 'shrink-window)
+  (define-key global-map (kbd "C-x >") 'enlarge-window-horizontally)
+  (define-key global-map (kbd "C-x <") 'shrink-window-horizontally)
+  (define-key global-map (kbd "C-x -") 'fit-window-to-buffer)
 
+  ;; Keybindings for resizing windows
+  (define-key resize-window-repeat-map (kbd ">") 'enlarge-window-horizontally)
+  (define-key resize-window-repeat-map (kbd "<") 'shrink-window-horizontally)
 
-    ;; windows keys
-    ;; Keybindings for window management
-    (define-key global-map (kbd "C-x C-n") 'next-buffer)
-    (define-key global-map (kbd "C-x C-p") 'previous-buffer)
-    (define-key global-map (kbd "C-x !") 'delete-other-windows-vertically)
-    (define-key global-map (kbd "C-x _") 'balance-windows)
-    (define-key global-map (kbd "C-x }") 'enlarge-window)
-    (define-key global-map (kbd "C-x {") 'shrink-window)
-    (define-key global-map (kbd "C-x >") 'enlarge-window-horizontally)
-    (define-key global-map (kbd "C-x <") 'shrink-window-horizontally)
-    (define-key global-map (kbd "C-x -") 'fit-window-to-buffer)
+  ;; repeat mode
+  (repeat-mode 1)
+  (blink-cursor-mode -1)
 
-    ;; Keybindings for resizing windows
-    (define-key resize-window-repeat-map (kbd ">") 'enlarge-window-horizontally)
-    (define-key resize-window-repeat-map (kbd "<") 'shrink-window-horizontally)
+  ;; works for opening link in the same buffer with org-open-at-point
+  (setq org-link-frame-setup '((file . find-file)))
 
-    ;; repeat mode
-    (repeat-mode 1)
-    (blink-cursor-mode -1)
+#+end_src
 
+* move text
+#+begin_src emacs-lisp
+  (use-package move-text
+    :ensure t
+    :bind
+    ("M-p" . move-text-up)
+    ("M-n" . move-text-down))
+#+end_src
+* gptel
+#+begin_src emacs-lisp
+  (use-package gptel
+    :ensure t
+    :config
+    (setq gptel-api-key (gptel-api-key-from-auth-source))
+    )
+#+end_src
+* telega
+#+begin_src emacs-lisp
+  (use-package telega
+    :ensure t)
 #+end_src
 
