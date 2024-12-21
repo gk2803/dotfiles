@@ -1,0 +1,24 @@
+* texlive installation
+#+begin_src sh
+  wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+  tar -xzvf install-tl-unx.tar.gz
+  cd install*
+  sudo perl install-tl
+  echo 'export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"' >> ~/.bashrc
+#+end_src
+* org-mode
+eval 
+#+begin_src emacs-lisp
+     (package-vc-install '(org-mode :url "https://code.tecosaur.net/tec/org-mode"))
+#+end_src
+Locate the installation path
+#+begin_src sh
+  cd ~/.emacs.d/elpa/org-mode/lisp
+  make
+#+end_src
+* direnv
+#+begin_src sh
+  sudo apt-get install direnv
+  echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
+#+end_src
+
