@@ -2,8 +2,7 @@
 requires =cmake= and =libvterm-dev=
 #+begin_src emacs-lisp
   (use-package vterm
-    :ensure t
-    )
+    :ensure t)
   (use-package multi-vterm
     :ensure t)
 #+end_src
@@ -64,6 +63,10 @@ requires =cmake= and =libvterm-dev=
   (use-package org
     :load-path "~/.emacs.d/elpa/org-mode/lisp/"
     :ensure t
+    :hook (org-mode . (lambda ()   ;; make local var has separate value  in the current buffer
+  		      (company-mode)
+  		      (set (make-local-variable 'company-backends)
+  			   '(company-yasnippet))))
     :bind (("C-c r" . org-anki-sync-entry))
     :config
     (setq org-babel-python-command "python3")
@@ -128,6 +131,9 @@ link that can be later used by the ~org-insert-link~ function
   (setq org-highlight-latex-and-related '(latex))
 #+end_src
 ** Capture
+:PROPERTIES:
+:ID:       cd548a7a-a6fc-4a1c-97d5-5137561e5089
+:END:
 First we create some =org-capture= templates in order to save our
 current Tasks, meetings, etc.  Those templates create the
 corresponding org files within Org directory.  The
@@ -230,73 +236,75 @@ a gateway to our individual notes.
       ;; So we match everything and then skip entries with
       ;; `org-agenda-skip-function'.
       `((tags-todo "*"
-		   ((org-agenda-overriding-header "Important tasks without a date\n")
-		    (org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
-		    (org-agenda-skip-function
-		     `(org-agenda-skip-entry-if
-		       'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
-		    (org-agenda-block-separator nil)))
-	(agenda "" ((org-agenda-overriding-header "\nPending scheduled tasks")
-		    (org-agenda-time-grid nil)
-		    (org-agenda-start-on-weekday nil)
-		    (org-agenda-span 1)
-		    (org-agenda-show-all-dates nil)
-		    (org-scheduled-past-days 365)
-		    ;; Excludes today's scheduled items
-		    (org-scheduled-delay-days 1)
-		    (org-agenda-block-separator nil)
-		    (org-agenda-entry-types '(:scheduled))
-		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "ROUTINE"))
-		    (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
-		    (org-agenda-format-date "")))
-	(agenda "" ((org-agenda-overriding-header "\nToday's agenda\n")
-		    (org-agenda-span 1)
-		    (org-deadline-warning-days 0)
-		    (org-agenda-block-separator nil)
-		    (org-scheduled-past-days 0)
-		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "ROUTINE"))
-		    ;; We don't need the `org-agenda-date-today'
-		    ;; highlight because that only has a practical
-		    ;; utility in multi-day views.
-		    (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
-		    (org-agenda-format-date "%A %-e %B %Y")))
-	(agenda "" ((org-agenda-overriding-header "\nNext three days\n")
-		    (org-agenda-start-on-weekday nil)
-		    (org-agenda-start-day nil)
-		    (org-agenda-start-day "+1d")
-		    (org-agenda-span 3)
-		    (org-deadline-warning-days 0)
-		    (org-agenda-block-separator nil)
-		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
-	(agenda "" ((org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")
-		    (org-agenda-time-grid nil)
-		    (org-agenda-start-on-weekday nil)
-		    ;; We don't want to replicate the previous section's
-		    ;; three days, so we start counting from the day after.
-		    (org-agenda-start-day "+4d")
-		    (org-agenda-span 14)
-		    (org-agenda-show-all-dates nil)
-		    (org-deadline-warning-days 0)
-		    (org-agenda-block-separator nil)
-		    (org-agenda-entry-types '(:deadline))
-		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done)))))
+  		   ((org-agenda-overriding-header "Important tasks without a date\n")
+  		    (org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
+  		    (org-agenda-skip-function
+  		     `(org-agenda-skip-entry-if
+  		       'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+  		    (org-agenda-block-separator nil)))
+  	(agenda "" ((org-agenda-overriding-header "\nPending scheduled tasks")
+  		    (org-agenda-time-grid nil)
+  		    (org-agenda-start-on-weekday nil)
+  		    (org-agenda-span 1)
+  		    (org-agenda-show-all-dates nil)
+  		    (org-scheduled-past-days 365)
+  		    ;; Excludes today's scheduled items
+  		    (org-scheduled-delay-days 1)
+  		    (org-agenda-block-separator nil)
+  		    (org-agenda-entry-types '(:scheduled))
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "routine"))
+  		    (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+  		    (org-agenda-format-date "")))
+  	(agenda "" ((org-agenda-overriding-header "\nToday's agenda\n")
+  		    (org-agenda-span 1)
+  		    (org-deadline-warning-days 0)
+  		    (org-agenda-block-separator nil)
+  		    (org-scheduled-past-days 0)
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "routine"))
+  		    ;; We don't need the `org-agenda-date-today'
+  		    ;; highlight because that only has a practical
+  		    ;; utility in multi-day views.
+  		    (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+  		    (org-agenda-format-date "%A %-e %B %Y")))
+  	(agenda "" ((org-agenda-overriding-header "\nNext three days\n")
+  		    (org-agenda-start-on-weekday nil)
+  		    (org-agenda-start-day nil)
+  		    (org-agenda-start-day "+1d")
+  		    (org-agenda-span 3)
+  		    (org-deadline-warning-days 0)
+  		    (org-agenda-block-separator nil)
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+  	(agenda "" ((org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")
+  		    (org-agenda-time-grid nil)
+  		    (org-agenda-start-on-weekday nil)
+  		    ;; We don't want to replicate the previous section's
+  		    ;; three days, so we start counting from the day after.
+  		    (org-agenda-start-day "+4d")
+  		    (org-agenda-span 14)
+  		    (org-agenda-show-all-dates nil)
+  		    (org-deadline-warning-days 0)
+  		    (org-agenda-block-separator nil)
+  		    (org-agenda-entry-types '(:deadline))
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done)))))
       "Custom agenda for use in `org-agenda-custom-commands'.")
 
+    
     (setq org-agenda-custom-commands
-	  `(("A" "Daily agenda and top priority tasks"
-	     ,my-org-custom-daily-agenda
-	     ((org-agenda-fontify-priorities nil)
-	      (org-agenda-prefix-format "	 %t %s")
-	      (org-agenda-dim-blocked-tasks nil)))
-	    ("P" "Plain text daily agenda and top priorities"
-	     ,my-org-custom-daily-agenda
-	     ((org-agenda-with-colors nil)
-	      (org-agenda-prefix-format "%t %s")
-	      (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
-	      (org-agenda-fontify-priorities nil)
-	      (org-agenda-remove-tags t))
-	     ("agenda.txt"))))
+  	  `(("A" "Daily agenda and top priority tasks"
+  	     ,my-org-custom-daily-agenda
+  	     ((org-agenda-fontify-priorities nil)
+  	      (org-agenda-prefix-format "	 %t %s")
+  	      (org-agenda-dim-blocked-tasks nil)))
+  	    ;; ("P" "Plain text daily agenda and top priorities"
+  	    ;;  ,my-org-custom-daily-agenda
+  	    ;;  ((org-agenda-with-colors nil)
+  	    ;;   (org-agenda-prefix-format "%t %s")
+  	    ;;   (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
+  	    ;;   (org-agenda-fontify-priorities nil)
+  	    ;;   (org-agenda-remove-tags t))
+  	    ;;  ("agenda.txt"))
+  	    ))
 
 
     ;; habits
@@ -689,11 +697,11 @@ check if we need to go further.
   (use-package auctex
     :ensure t    
     :config
+    (setq-default TeX-master nil)
     (setq TeX-auto-save t)
     (setq TeX-parse-self t)
     ;; if you often use \include or \input, make AUCTEX aware of the multifile doc structure
     ;; https://www.gnu.org/software/auctex/manual/auctex/Multifile.html
-    (setq-default TeX-master nil)		
     ;; set pdf tools as the default auctex pdf viewer
     (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
     (setq TeX-source-correlate-start-server t)
@@ -707,7 +715,10 @@ check if we need to go further.
     ;; update pdf tools buffer
     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)) 
 #+end_src
-** LaTeX-auto-activating-snippets
+** LaTeX-auto-activating-snippets (laas)
+:PROPERTIES:
+:ID:       622ec87b-cc5c-4f9f-b310-534226dd12d7
+:END:
 This package need to have ~aas~ installed as well.
 https://github.com/tecosaur/LaTeX-auto-activating-snippets
 #+begin_src emacs-lisp
@@ -747,24 +758,12 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       :cond #'laas-object-on-left-condition
       "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))
       :cond (lambda() (not (texmathp))) ;;expand when not in math 
-      "fm" '(yas "\\\\( $1 \\\\)")
+      "fm" '(yas "\\\\($1\\\\)")
       "cpp" '(yas "\\cp{P}")
       "cpv" '(yas "\\cp{V}")
       ))
 #+end_src
-** Cdlatex
-CdLaTeX is a minor mode that is normally used in combination with a
-major LaTeX mode like AUCTex.
-#+begin_src emacs-lisp
-  (use-package cdlatex
-    :ensure t
-    ;;      :hook (LaTeX-mode)
-    :defer t
-    :config
-    (setq cdlatex-takeover-parenthesis nil)
-    (setq cdlatex-paired-parens nil))
-#+end_src
-** lsp-latex
+** lsp-lpatex
 #+begin_src emacs-lisp
   (use-package lsp-latex
     :ensure t
@@ -777,8 +776,7 @@ major LaTeX mode like AUCTex.
   (use-package yasnippet
     :ensure t
     :config 
-    (setq yas-snippet-dirs (append yas-snippet-dirs
-				   '("~/Nextcloud/snippets/")))  
+    (setq yas-snippet-dirs '("~/Nextcloud/snippets/"))  
     (yas-global-mode 1))
 #+end_src
 * Diary
@@ -847,7 +845,6 @@ change the theme based on the sunset and sunrise times.
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
 displays web pages using [[*shr (simple HTML renderer)][shr]]. A prequisite for using shr is building
 emacs with libxml2 support.
-
 #+begin_src emacs-lisp
   (use-package browse-url
     :ensure nil
@@ -886,71 +883,82 @@ emacs with libxml2 support.
   (use-package lsp-mode
     :ensure t
     :defer t
+    :bind (("C-<tab>" . lsp-ui-doc-show)
+    	 ("C-c TAB" . lsp-ui-doc-focus-frame)
+    	 ("C-c C-r" . lsp-ui-peek-find-references)
+    	 ("C-c o" . lsp-ui-peek-find-definitions))
     :commands (lsp lsp-deferred) ;; lsp mode gets loaded when lsp, lsp-deferred are triggered
-    :init
-    (setq lsp-keymap-prefix "C-c C-l")
     :config
     (lsp-enable-which-key-integration t)
+    (setq lsp-ui-doc-show-with-mouse 1)
     (setq read-process-output-max (* 1024 1024))
-    (setq lsp-ui-sideline-enable nil))
+    (setq lsp-ui-sideline-enable t)
+    :preface
+    (defun lsp-booster--advice-json-parse (old-fn &rest args)
+      "Try to parse bytecode instead of json."
+      (or
+       (when (equal (following-char) ?#)
+         (let ((bytecode (read (current-buffer))))
+  	 (when (byte-code-function-p bytecode)
+             (funcall bytecode))))
+       (apply old-fn args)))
+
+    (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+      "Prepend emacs-lsp-booster command to lsp CMD."
+      (let ((orig-result (funcall old-fn cmd test?)))
+        (if (and (not test?)                             ;; for check lsp-server-present?
+                 (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+                 lsp-use-plists
+                 (not (functionp 'json-rpc-connection))  ;; native json-rpc
+                 (executable-find "emacs-lsp-booster"))
+            (progn
+              (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+                (setcar orig-result command-from-exec-path))
+              (message "Using emacs-lsp-booster for %s!" orig-result)
+              (cons "emacs-lsp-booster" orig-result))
+  	orig-result)))
+
+    :init
+    (advice-add (if (progn (require 'json)
+                           (fboundp 'json-parse-buffer))
+                    'json-parse-buffer
+                  'json-read)
+                :around
+                #'lsp-booster--advice-json-parse)
+    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+
+
+  (use-package lsp-ui
+    :ensure t
+    :hook (lsp-mode . lsp-ui-mode)
+    :after lsp-mode)
+
+
 
 #+end_src
 *** Python
 #+begin_src emacs-lisp
+  (use-package direnv
+      :ensure t
+      :config
+      (direnv-mode))
+
   (use-package python-mode
-    :mode "\\.py\\'"
-    :hook (python-mode . lsp)
-    :config
-    (setq python-indent-offset 4)
-    (setq compilation-ask-about-save nil))
+    :mode ("\\.py\\`" . python-mode)
+    :hook
+    (python-mode . direnv-mode)
+    (python-mode . company-mode)
+    (python-mode . yas-minor-mode))
 
-  (use-package envrc
-    :ensure t
-    :hook (after-init . envrc-global-mode))
 
-  (use-package pyvenv
+    (use-package lsp-pyright
     :ensure t
-    :config
-    (pyvenv-mode 1))
-
-  (use-package lsp-pyright
-    :ensure t
-    :custom (lsp-pyright-langserver-command "pyright") ;; or basedpyright
-    :hook (python-mode . (lambda ()
-			   (require 'lsp-pyright)
-			   (lsp))))  ; or lsp-deferred
+    :hook
+    (python-mode . (lambda ()
+                     (require 'lsp-pyright)
+                     (lsp-deferred))))
 
 #+end_src
-*** Php
-#+begin_src emacs-lisp
-  (use-package php-mode
-    :mode "\\.php\\'"
-    :hook (php-mode . lsp-deferred)
-    :config
-    (setq php-indent-level 4))
-#+end_src
-*** Java
-#+begin_src emacs-lisp
-  (use-package lsp-java
-    :ensure t
-    :defer t
-    :config
-    (add-hook 'java-mode-hook #'lsp-deferred)
-    (setq lsp-java-format-on-type-enabled nil)
-    (setq lsp-enable-on-type-formatting nil)    
-    )
-  (use-package dap-mode
-    :ensure t
-    :defer t
-    :after lsp-mode
-    :config (dap-auto-configure-mode))
-  (use-package dap-java
-    :ensure nil)
-
-
-
-#+end_src
-
 *** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode
@@ -960,6 +968,13 @@ emacs with libxml2 support.
     :hook (rust-mode . lsp-deferred))
 
 #+end_src
+*** C
+#+begin_src emacs-lisp
+  (use-package c-mode
+    :mode ("\\.c\\`" . c-mode)
+    :hook (c-mode . lsp-deferred))
+#+end_
+
 ** Tree sitter
 #+begin_src emacs-lisp
   ;; (setq treesit-language-source-alist
@@ -994,7 +1009,6 @@ emacs with libxml2 support.
     :custom   
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0)
-
 
     )
 #+end_src
@@ -1249,11 +1263,29 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     :ensure t
     :config
     (setq gptel-api-key (gptel-api-key-from-auth-source))
+    (setq gptel-model "Chat-GPT:gpt-4o")
     )
 #+end_src
-* telega
+* ox-hugo
 #+begin_src emacs-lisp
-  (use-package telega
-    :ensure t)
+  (use-package ox-hugo
+    :ensure t
+    :pin melpa
+    :after ox
+    :config
+    (setq org-hugo-base-dir "~/Projects/blog")
+    (setq org-hugo-default-section-directory "posts")
+    )
 #+end_src
+* treemacs
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :bind ("C-c p" . treemacs-add-and-display-current-project)
+    :config
+    (setq treemacs-follow-mode t))
+#+end_src
+
+
+
 
