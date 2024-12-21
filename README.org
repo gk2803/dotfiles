@@ -21,4 +21,10 @@ Locate the installation path
   sudo apt-get install direnv
   echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
 #+end_src
-
+* lsp-booster
+#+begin_src sh
+  mkdir ~/sources
+  cd ~/sources  
+  git clone https://github.com/blahgeek/emacs-lsp-booster
+  sudo ln -s ~/sources/emacs-lsp-booster/target/release/emacs-lsp-booster /usr/local/bin/emacs-lsp-booster
+#+end_src
