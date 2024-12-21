@@ -1,9 +1,8 @@
-* Terminal
+* terminal
 requires =cmake= and =libvterm-dev=
 #+begin_src emacs-lisp
   (use-package vterm
-    :ensure t
-    )
+    :ensure t)
   (use-package multi-vterm
     :ensure t)
 #+end_src
@@ -12,20 +11,17 @@ requires =cmake= and =libvterm-dev=
   (use-package which-key
     :ensure t
     :init
-    (which-key-mode)) ;;ensure t makes sure this package is installed
+    (which-key-mode)) 
 #+end_src
 * miscellaneous
 #+begin_src emacs-lisp
   ;; server start
-  (server-start)
+  (require 'server)
+  (unless (server-running-p)
+    (server-start))
+
   ;; yes or no alias
   (defalias 'yes-or-no-p 'y-or-n-p)
-
-  ;; no backups
-  ;; no autosaves
-  (setq make-backup-file nil) 
-  (setq auto-save-default nil)
-
   ;; cursor highlight
   (global-hl-line-mode -1)
 
@@ -35,7 +31,7 @@ requires =cmake= and =libvterm-dev=
   ;; no tool bar, menu bar, scroll bar
   (tool-bar-mode -1) 
   (menu-bar-mode -1) 
-  (scroll-bar-mode -1)
+
 
   ;; startup message
   (setq inhibit-startup-message t)
@@ -46,75 +42,15 @@ requires =cmake= and =libvterm-dev=
   (global-display-line-numbers-mode) ;; I have no Idea what this is
 
   ;; global keybindings
-  (global-set-key (kbd "C-c a") 'beginning-of-buffer)
-  (global-set-key (kbd "C-c e") 'end-of-buffer)
+					  ;(global-set-key (kbd "C-c a") 'beginning-of-buffer)
+					  ; (global-set-key (kbd "C-c e") 'end-of-buffer)
   (global-set-key (kbd "M--") 'count-words)
   (global-set-key (kbd "M-o") 'mode-line-other-buffer)
   (global-set-key (kbd "C-x k") 'kill-current-buffer)
-  
-#+end_src
-** mode line
-#+begin_src emacs-lisp
-  (setq-default mode-line-format
-		'("%e" ;some information may appear in the echo area if content too long
-		  my-modeline-buffer-name
-		  "    "
-		  my-modeline-major-mode
-
-		  ))
-
-  (defvar-local my-modeline-buffer-name
-      '(:eval
-	(propertize (buffer-name) 'face 'warning))	
-    "Mode line construct to display the buffer mode."
-    )
-
-  (defun my-modeline-major-mode-name ()
-    "Return capitalized 'major-mode'"
-    (capitalize (string-replace "-mode" "" (symbol-name major-mode)))
-    )
-
-  (defvar-local my-modeline-major-mode
-      '(:eval
-	(when (mode-line-window-selected-p)
-	  (list
-	   (propertize "λ" 'face 'shadow)
-	   " "
-	   (propertize  (my-modeline-major-mode-name) 'face 'bold))
-	  )
-	"Mode line construct to display the major mode."))
 
 
-
-  (dolist (construct '(my-modeline-major-mode
-		       my-modeline-buffer-name))
-    (put construct 'risky-local-variable t))
-
-  (defun display-custom-time-format ()
-    "Display the current time formatted as YYYY-MM-DD HH:MM:SS in the echo area."
-    (interactive)
-    (message (format-time-string "%a %B, %d %H:%M")))
-  (display-custom-time-format)
-
-
-
-
-
-
-  (mode-line-window-selected-p)
-  (defun mode-line-window-selected-p()
-    "Return non-nil if we're updating the mode line for the selected window.
-  This function is meant to be called in `:eval' mode line constructs
-  to allow altering the look of the mode line depending on whether the mode line
-  belongs to the currently selected window or not."
-    (let ((window (selected-window)))
-      (or (eq window (old-selected-window))
-	  (and (minibuffer-window-active-p (minibuffer-window))
-	       (with-selected-window (minibuffer-window)
-		 (eq window (minibuffer-selected-window)))))))
 
 #+end_src
-
 * beacon 
 #+begin_src emacs-lisp
   (use-package beacon
@@ -123,10 +59,38 @@ requires =cmake= and =libvterm-dev=
     (beacon-mode 1))
 #+end_src
 * Org
-** source code edit 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c s") 'org-edit-src-code)
-#+End_src
+  (use-package org
+    :load-path "~/.emacs.d/elpa/org-mode/lisp/"
+    :ensure t
+    :hook (org-mode . (lambda ()   ;; make local var has separate value  in the current buffer
+  		      (company-mode)
+  		      (set (make-local-variable 'company-backends)
+  			   '(company-yasnippet))))
+    :bind (("C-c r" . org-anki-sync-entry))
+    :config
+    (setq org-babel-python-command "python3")
+    (setq org-directory "~/Nextcloud/org")
+    (setq fill-collumn 120)
+    (setq org-src-fontify-natively t)
+    
+    (setq org-id-link-to-org-use-id t) ;; sets a unique custom id property under header when `org-store-link' is invoked
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t) 
+       (shell . t)
+       (rust . t)))
+    
+    ;; org anki
+    (setq org-anki-default-note-type "Basic (and reversed card)")
+    
+    (defun toggle-org-hide-emphasis-markers ()
+      "Toggle value of org=hide-emphasis-markers`"
+      (interactive)
+      (setq org-hide-emphasis-markers (not org-hide-emphasis-markers))
+      (org-mode-restart))
+    )
+#+end_src
 ** language evaluation
 this is used in order to evaluate python code inside a block.
 Example: we press ~C-c C-,~ in order to invoke the
@@ -161,45 +125,15 @@ link that can be later used by the ~org-insert-link~ function
   (global-set-key (kbd "C-c l") 'org-store-link)
 #+end_src
 
-When reaching the 80 character limit in a org-mode file then the line
-will automatically change
-#+begin_src emacs-lisp
-  (add-hook 'org-mode-hook (lambda ()
-			     (setq fill-collumn 120)
-			     (auto-fill-mode 1)))
-#+end_src
-
-open link at the current buffer: [[https://emacs.stackexchange.com/questions/69706/how-to-open-a-file-from-an-org-link-within-current-window][stack]]
-
-#+begin_src emacs-lisp
-  (defun mda/org-open-current-window ()                                              
-    "Opens file in current window."                                                  
-    (interactive)                                                                    
-    (let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
-      (org-open-at-point)))                  
-  (define-key global-map (kbd "C-c o") #'mda/org-open-current-window)   
-#+end_src
-
-hide emphasis markers, better for previewing
-#+begin_src emacs-lisp
-  (defun toggle-org-hide-emphasis-markers ()
-    "Toggle value of org=hide-emphasis-markers`"
-    (interactive)
-    (setq org-hide-emphasis-markers (not org-hide-emphasis-markers))
-    (org-mode-restart))  
-#+end_src
-
-set org directory
-
-#+begin_src emacs-lisp
-  (setq org-directory "~/Nextcloud/org")
-#+end_src
 ** latex config
 #+begin_src emacs-lisp
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
   (setq org-highlight-latex-and-related '(latex))
 #+end_src
 ** Capture
+:PROPERTIES:
+:ID:       cd548a7a-a6fc-4a1c-97d5-5137561e5089
+:END:
 First we create some =org-capture= templates in order to save our
 current Tasks, meetings, etc.  Those templates create the
 corresponding org files within Org directory.  The
@@ -265,7 +199,7 @@ a gateway to our individual notes.
 	     :empty-lines-after 1)
 	    ("h" "Habits" entry
 	     (file+headline "tasks.org" "Habits")
-	     ,(concat "* TODO %^{Title}\n"
+	     ,(concat "* TODO %^{Title} %^g\n"
 		      "%^{|SCHEDULED}: %^t\n"
 		      ":PROPERTIES:\n"
 		      ":STYLE:    habit\n"
@@ -292,7 +226,85 @@ a gateway to our individual notes.
     :config
     (setq org-agenda-include-diary t)
     (setq org-agenda-files `(,org-directory))
+    ;; The value we will be editing for custom agenda view
+    ;; is `org-agenda-custom-commands'
 
+    (defvar my-org-custom-daily-agenda
+      ;;
+      ;; tags-todo "+PRIORITY=\"A\""
+      ;;
+      ;; So we match everything and then skip entries with
+      ;; `org-agenda-skip-function'.
+      `((tags-todo "*"
+  		   ((org-agenda-overriding-header "Important tasks without a date\n")
+  		    (org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
+  		    (org-agenda-skip-function
+  		     `(org-agenda-skip-entry-if
+  		       'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+  		    (org-agenda-block-separator nil)))
+  	(agenda "" ((org-agenda-overriding-header "\nPending scheduled tasks")
+  		    (org-agenda-time-grid nil)
+  		    (org-agenda-start-on-weekday nil)
+  		    (org-agenda-span 1)
+  		    (org-agenda-show-all-dates nil)
+  		    (org-scheduled-past-days 365)
+  		    ;; Excludes today's scheduled items
+  		    (org-scheduled-delay-days 1)
+  		    (org-agenda-block-separator nil)
+  		    (org-agenda-entry-types '(:scheduled))
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "routine"))
+  		    (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+  		    (org-agenda-format-date "")))
+  	(agenda "" ((org-agenda-overriding-header "\nToday's agenda\n")
+  		    (org-agenda-span 1)
+  		    (org-deadline-warning-days 0)
+  		    (org-agenda-block-separator nil)
+  		    (org-scheduled-past-days 0)
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "routine"))
+  		    ;; We don't need the `org-agenda-date-today'
+  		    ;; highlight because that only has a practical
+  		    ;; utility in multi-day views.
+  		    (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+  		    (org-agenda-format-date "%A %-e %B %Y")))
+  	(agenda "" ((org-agenda-overriding-header "\nNext three days\n")
+  		    (org-agenda-start-on-weekday nil)
+  		    (org-agenda-start-day nil)
+  		    (org-agenda-start-day "+1d")
+  		    (org-agenda-span 3)
+  		    (org-deadline-warning-days 0)
+  		    (org-agenda-block-separator nil)
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))))
+  	(agenda "" ((org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")
+  		    (org-agenda-time-grid nil)
+  		    (org-agenda-start-on-weekday nil)
+  		    ;; We don't want to replicate the previous section's
+  		    ;; three days, so we start counting from the day after.
+  		    (org-agenda-start-day "+4d")
+  		    (org-agenda-span 14)
+  		    (org-agenda-show-all-dates nil)
+  		    (org-deadline-warning-days 0)
+  		    (org-agenda-block-separator nil)
+  		    (org-agenda-entry-types '(:deadline))
+  		    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done)))))
+      "Custom agenda for use in `org-agenda-custom-commands'.")
+
+    
+    (setq org-agenda-custom-commands
+  	  `(("A" "Daily agenda and top priority tasks"
+  	     ,my-org-custom-daily-agenda
+  	     ((org-agenda-fontify-priorities nil)
+  	      (org-agenda-prefix-format "	 %t %s")
+  	      (org-agenda-dim-blocked-tasks nil)))
+  	    ;; ("P" "Plain text daily agenda and top priorities"
+  	    ;;  ,my-org-custom-daily-agenda
+  	    ;;  ((org-agenda-with-colors nil)
+  	    ;;   (org-agenda-prefix-format "%t %s")
+  	    ;;   (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
+  	    ;;   (org-agenda-fontify-priorities nil)
+  	    ;;   (org-agenda-remove-tags t))
+  	    ;;  ("agenda.txt"))
+  	    ))
 
 
     ;; habits
@@ -311,8 +323,19 @@ prettifies org-mode
     :after org
     :hook (org-mode . org-bullets-mode))
 #+end_src
+** org habits stats
+#+begin_src emacs-lisp
+  (use-package org-habit-stats
+    :ensure)
+
+
+
+#+end_src
+
 * Vertico
 #+begin_src emacs-lisp
+  ;; Vertico
+  ;; VERTical Interactive Completion
   (use-package vertico
     :ensure t
     :init
@@ -362,6 +385,9 @@ prettifies org-mode
     (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 * Denote
+:PROPERTIES:
+:ID:       60189a31-2193-4906-ad87-c8e074810aca
+:END:
 Now, what if I want to reference the source when =denote-region= is
 called?
 
@@ -374,130 +400,147 @@ called?
 3. The function, =my-denote-region= is my version of the function
    =denote-region= which adds also prompts for a signature.
 #+begin_src emacs-lisp
-    (use-package denote
-      :ensure t
-      :init
-      (setq denote-directory '"~/Nextcloud/Documents/publicNotes")
-      :bind
-      (:map global-map
-	    ("C-c n j" . denote-journal-extras-new-or-existing-entry)
-	    ("C-c n f" . my-denote-reference)
-	    ("C-c n i" . my-denote-fleeting)
-	    ("C-c n n" . my-denote-zk)
-	    ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
-	    )	  
-      :config
-      ;; set the order of denote naming scheme
-      (setq denote-file-name-components-order '(identifier signature title keywords ))      
+  (use-package denote
+    :ensure t
+    :init
+    (setq denote-directory '"~/Nextcloud/Documents/publicNotes")
+    :bind
+    (:map global-map
+	  ("C-c n j" . denote-journal-extras-new-or-existing-entry)
+	  ("C-c n r" . my-denote-reference)
+	  ("C-c n i" . my-denote-inbox)
+	  ("C-c n n" . my-denote-zk)
+	  ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
+	  )	  
+    :config
+    ;; set the order of denote naming scheme
+    (setq denote-file-name-components-order '(identifier signature title keywords ))
 
-      ;; Variant of `my-denote-region' to reference the source
-      (defun my-denote-region-get-source-reference ()
-	"Get a reference to the source for use with `my-denote-region'.
-	  The reference is a URL or an Org-formatted link to a file."
-	;; We use a `cond' here because we can extend it to cover more
-	;; cases.
-	(cond
-	 ((derived-mode-p 'eww-mode)
-	  (plist-get eww-data :url))
-	 ;; Here we are just assuming an Org format.  We can make this more
-	 ;; involved, if needed.
-	 (buffer-file-name
-	  (format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
+    ;; Variant of `my-denote-region' to reference the source
+    (defun my-denote-region-get-source-reference ()
+      "Get a reference to the source for use with `my-denote-region'.
+       The reference is a URL or an Org-formatted link to a file."
+      ;; We use a `cond' here because we can extend it to cover more
+      ;; cases.
+      (cond
+       ((derived-mode-p 'eww-mode)
+	(plist-get eww-data :url))
+       ;; Here we are just assuming an Org format.  We can make this more
+       ;; involved, if needed.
+       (buffer-file-name
+	(format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
 
-      (defun my-denote-region (&optional lst)
-	"Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
-	If LST is not provided, use the default list '(title signature)."
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
-	  (if-let (((region-active-p))
-		   ;; Capture the text early, otherwise it will be empty
-		   ;; the moment `insert` is called.
-		   (text (buffer-substring-no-properties (region-beginning) (region-end))))
-	      (progn
-		(let ((denote-ignore-region-in-denote-command t))
-		  (call-interactively #'denote))
-		(push-mark (point))
-		(insert text)
-		(run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
-	    ;; If no region is active, just call `denote` with the prompt list.
-	    (call-interactively #'denote))))
+    (defun my-denote-region (&optional lst)
+      "Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
+			    If LST is not provided, use the default list '(title signature)."
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
+	(if-let (((region-active-p)) 
+		 ;; Capture the text early, otherwise it will be empty
+		 ;; the moment `insert` is called.
+		 (text (buffer-substring-no-properties (region-beginning) (region-end))))
+	    (progn
+	      (let ((denote-ignore-region-in-denote-command t))
+		(call-interactively #'denote))
+	      (push-mark (point))
+	      (insert text)
+	      (run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
+	  ;; If no region is active, just call `denote` with the prompt list.
+	  (call-interactively #'denote))))
 
-      (defun my-denote-region-with-reference-zk ()
-	"Like `denote-region', but add the context afterwards.
-	    For how the context is retrieved, see `my-denote-region-get-source-reference'."
-	(interactive)
-	(let ((context (my-denote-region-get-source-reference))
-	      (denote-directory "~/Nextcloud/Documents/publicNotes/"))
-	  (my-denote-region '(signature title keywords))
-	  (when context
-	    (goto-char (point-max))
-	    (insert "\n")
-	    (insert context))))
+    (defun my-denote-region-with-reference-zk ()
+      "Like `denote-region', but add the context afterwards.
+				For how the context is retrieved, see `my-denote-region-get-source-reference'."
+      (interactive)
+      (let ((context (my-denote-region-get-source-reference))
+	    (denote-directory "~/Nextcloud/Documents/publicNotes/")
+	    (denote-file-name-components-order '(signature title keywords identifier)))
+	(my-denote-region '(signature title keywords))
+	(when context
+	  (goto-char (point-max))
+	  (insert "\n")
+	  (insert context))))
 
-      (defun my-denote-region-with-reference ()
-	"Like `my-denote-region-with-reference-zk' but saved at references
-	and has no signature"
-	(interactive)
-	(let ((context (my-denote-region-get-source-reference))
-	      (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
-	  (my-denote-region '(title keywords))
-	  (when context
-	    (goto-char (point-max))
-	    (insert "\n")
-	    (insert context))))
+    (defun my-denote-zk ()
+      "Like `denote', but with the prompts order of `my-denote-zk'"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
+	    (denote-file-name-components-order '(signature title keywords identifier))
+	    (denote-prompts '(signature title keywords)))
+	(call-interactively 'denote)))
 
-      (defun my-denote-fleeting ()
-	"Create a simple post note, something you might want to remember,
-	  everything goes"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("fleeting"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
+    (defun my-denote-region-with-reference-reference ()
+      "Like `my-denote-region-with-reference-zk' but saved as a `reference'
+       and has no signature"
+      (interactive)
+      (let ((context (my-denote-region-get-source-reference))
+	    (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
+	(my-denote-region '(title keywords))
+	(when context
+	  (goto-char (point-max))
+	  (insert "\n")
+	  (insert context))))
+
+    (defun my-denote-inbox ()
+      "Create a simple post note, something you might want to remember,
+       everything goes"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
+	    (denote-infer-keywords nil)
+	    (denote-known-keywords '("fleeting"))
+	    (denote-prompts '(title keywords)))
+	(call-interactively 'denote)))
 
 
+    (defun my-denote-reference ()
+      "Create a reference note"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
+	    (denote-infer-keywords nil)
+	    (denote-known-keywords '("reference" "book"))
+	    (denote-prompts '(title keywords)))
+	(call-interactively 'denote)))
 
-      (defun my-denote-zk ()
-	"Create the main zettelkasten note"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
-	      (denote-prompts '(signature title keywords))
-	      (denote-file-name-components-order '(signature title keywords identifier)))
-	  (call-interactively 'denote)))
+    (defun my-denote-curated ()
+      "Create a curated Note, a well established thought, an article"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
+	    (denote-infer-keywords nil)
+	    (denote-known-keywords '("curated"))
+	    (denote-prompts '(title keywords)))
+	(call-interactively 'denote)))
 
-      (defun my-denote-reference ()
-	"Create a reference note"
-	(declare (interactive-only-t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("reference" "book"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
+    (defun my-denote-rename-file-signature ()
+      "rename file using the naming convention I use on my zk notes"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-file-name-components-order '(signature title keywords identifier)))
+	(call-interactively 'denote-rename-file-signature)))
 
-      (defun my-denote-curated ()
-	"Create a curated Note, a well established thought, an article"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("curated"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
+    ;; reference: 13. Keep a journal or diary
+    ;; added org-anki-journal in the front matter 
+    (defun my-denote-tech-journal-new-or-existing-entry()
+      "Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
+      (interactive)
+      (let ((denote-journal-extras-keyword "techjournal")
+	    (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
+	    (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n\n* Anki Headers\n\n* Journal")))
+	(call-interactively 'denote-journal-extras-new-or-existing-entry)))
 
-      ;; referecnce: 13. Keep a journal or diary
-      ;; added org-anki-journal in the front matter 
-      (defun my-denote-tech-journal-new-or-existing-entry()
-	"Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
-	(interactive)
-	(let ((denote-journal-extras-keyword "techjournal")
-	      (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-	      (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n")))
-	  (call-interactively 'denote-journal-extras-new-or-existing-entry))))
+    ;; shell file type configuration
+    ;; `denote-file-type' is an alist that holds the configuration options
+    ;; of every denote associated extension
+    ;; see https://protesilaos.com/codelog/2022-10-30-demo-denote-custom-file-type/
+
+    (setq denote-commands-for-new-notes '(denote my-denote-zk my-denote-reference))
+    )  
+
+
 #+end_src
 * Dired
 ** basic config
@@ -652,42 +695,39 @@ check if we need to go further.
 ** Auctex
 #+begin_src emacs-lisp
   (use-package auctex
-    :ensure t
-    :defer t
-    :mode ("\\.tex\\'" . LaTeX-mode)
+    :ensure t    
     :config
+    (setq-default TeX-master nil)
     (setq TeX-auto-save t)
     (setq TeX-parse-self t)
     ;; if you often use \include or \input, make AUCTEX aware of the multifile doc structure
-    (setq-default TeX-master nil)
-    ;; set zathura as the default auctex pdf viewer
-    (setq TeX-view-program-selection '((output-pdf "Zathura")))
-    ;; automatically insert the other pair of (,{,[
-    (setq LaTeX-electric-left-right-brace t)
-    (add-hook 'LaTeX-mode-hook
-	      (lambda () (setq-local TeX-electric-math
-				     (cons "$" "$")))))
+    ;; https://www.gnu.org/software/auctex/manual/auctex/Multifile.html
+    ;; set pdf tools as the default auctex pdf viewer
+    (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+    (setq TeX-source-correlate-start-server t)
+    (setq LaTeX-default-options "a4paper,12pt,draft")
+    ;; automatically insert the other pair of a bracket
+    (setq LaTeX-electric-left-right-brace nil)
+
+    ;; no prettified SHIT
+    (setq font-latex-fontify-script nil)
+    (setq font-latex-math-environments nil)
+    ;; update pdf tools buffer
+    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)) 
 #+end_src
-** Company Auctex
-#+begin_src emacs-lisp
-  (use-package company-auctex
-    :ensure t
-    :after (company auctex)
-    :config
-    (company-auctex-init))
-#+end_src
-** LaTeX-auto-activating-snippets
+** LaTeX-auto-activating-snippets (laas)
+:PROPERTIES:
+:ID:       622ec87b-cc5c-4f9f-b310-534226dd12d7
+:END:
 This package need to have ~aas~ installed as well.
 https://github.com/tecosaur/LaTeX-auto-activating-snippets
 #+begin_src emacs-lisp
   (use-package laas
     :ensure t
-    :hook ((org-mode LaTeX-mode) . laas-mode)
+    :hook (( LaTeX-mode . laas-mode)
+	   (org-mode . laas-mode))
+
     :config ; do whatever here
-    (defun my-laas-beginning-of-line-condition()
-      "Return t if snippet key is at the beginning of line"
-      (interactive)
-      (looking-back "^dm" nil))
     (aas-set-snippets 'laas-mode 
       ;; set condition!
       :cond #'texmathp ;; expand only while in math
@@ -696,10 +736,13 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       "cup" '(yas "\\cup$1")
       "ceil" '(yas "\\lceil $1 \\rceil $0")
       "flr" '(yas "\\lfloor $1 \\rfloor $0")
+      "mod" '(yas "\\mod $1")
       "cir" "\\circ " ;; composition
+      ";;x" "\\oplus"
       "supp" "\\supp"
       "On" "O(n)"
       "O1" "O(1)"
+      ":=" "\\coloneqq"
       "Olog" "O(\\log n)"
       "Olon" "O(n \\log n)"
       ";;{" " \\subseteq "
@@ -707,23 +750,33 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       ;; bind to functions!
       "Sum" (lambda () (interactive)
 	      (yas-expand-snippet "\\sum_{n=$1}^{$2} $0"))
+      "Prod" (lambda () (interactive)
+	       (yas-expand-snippet "\\prod_{$1}^{$2} $0"))
       "Span" (lambda () (interactive)
 	       (yas-expand-snippet "\\Span($1)$0"))
       ;; add accent snippets
       :cond #'laas-object-on-left-condition
       "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))
       :cond (lambda() (not (texmathp))) ;;expand when not in math 
-      "fm" '(yas "\\\\( $1 \\\\)")
-
+      "fm" '(yas "\\\\($1\\\\)")
+      "cpp" '(yas "\\cp{P}")
+      "cpv" '(yas "\\cp{V}")
       ))
 #+end_src
+** lsp-lpatex
+#+begin_src emacs-lisp
+  (use-package lsp-latex
+    :ensure t
+    :hook((tex-mode . lsp)
+  	(LaTeX-mode . lsp)))
+#+end_src
+
 * YASnippet
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
     :config 
-    (setq yas-snippet-dirs (append yas-snippet-dirs
-				   '("~/Nextcloud/snippets/")))  
+    (setq yas-snippet-dirs '("~/Nextcloud/snippets/"))  
     (yas-global-mode 1))
 #+end_src
 * Diary
@@ -751,6 +804,9 @@ sunrise times and choose a theme accordingly.
     )
 #+end_src
 * Modus Themes
+:PROPERTIES:
+:ID:       9d0cbd6e-75b7-442f-a34b-618a59843523
+:END:
 change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
   (use-package modus-themes
@@ -759,43 +815,19 @@ change the theme based on the sunset and sunrise times.
     :bind (("<f5>" . modus-themes-toggle)
 	   ("C-<f5>" . modus-themes-select))
     :config
-    ;; configure modus themes
-    (setq modus-themes-italic-constructs t
-	  modus-themes-bold-constructs nil)
 
-    ;; Configure modus themes to toggle with the 'modus-themes-toggle' command
+    (defun my-dark-theme-p()
+      "returns non-nil if `lxappearance' has set a dark theme in its config file"
+      (string-match-p
+       "dark"
+       (shell-command-to-string "cat ~/.config/xsettingsd/xsettingsd.conf |grep Net/ThemeName")))
+
+    (if (my-dark-theme-p) 
+	(modus-themes-load-theme 'modus-vivendi)
+      (modus-themes-load-theme 'modus-operandi))
+
+
     (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
-
-  ;; Keybinding to toggle between modus vivendi and modus operandi
-
-
-  ;; Function to convert current time to decimal representation
-  ;; (defun current-time-to-decimal ()
-  ;;   "Return the current time as a floating point number where 18:30 is represented as 18.50."
-  ;;   (let* ((now (decode-time (current-time)))
-  ;; 	 (hour (nth 2 now))
-  ;; 	 (minute (nth 1 now)))
-  ;;     (+ hour (/ minute 60.0))))
-
-  ;; ;; Function to get current date as a list 
-  ;; (defun current-date()
-  ;;   "Return the current date as a list of (mont day year)."
-  ;;   (let* ((now (decode-time (current-time)))
-  ;; 	 (month (nth 4 now))
-  ;; 	 (day (nth 3 now))
-  ;; 	 (year (nth 5 now)))
-  ;;     (list month day year)))
-
-
-  ;; (setq my-sunrise-sunset (solar-sunrise-sunset (current-date)))
-
-  ;; ;; Load themes based on current time
-  ;; (let ((sunrise (car (car my-sunrise-sunset)))
-  ;;       (sunset (car (cadr my-sunrise-sunset))))
-  ;;   (if (and (>=  (current-time-to-decimal) sunrise)
-  ;; 	   (< (current-time-to-decimal) sunset))
-  ;;       (load-theme 'modus-operandi-tinted :no-confirm)
-  ;;     (load-theme 'modus-vivendi-tinted  :no-confirm)))
 #+end_src
 
 * RSS/Atom 
@@ -803,18 +835,16 @@ change the theme based on the sunset and sunrise times.
   (use-package elfeed
     :ensure t
     :defer t
-    :bind
-    ("C-x e" . elfeed)
     :config
     (setq elfeed-feeds '("https://protesilaos.com/master.xml"
 			 "https://lyra.horse/blog/posts/index.xml"
-			 "http://www.masteringemacs.org/feed")))
+			 "http://www.masteringemacs.org/feed"
+			 "https://karthinks.com/index.xml")))
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
 displays web pages using [[*shr (simple HTML renderer)][shr]]. A prequisite for using shr is building
 emacs with libxml2 support.
-
 #+begin_src emacs-lisp
   (use-package browse-url
     :ensure nil
@@ -838,23 +868,6 @@ emacs with libxml2 support.
     (setq shr-discard-aria-hidden t)
     (setq shr-cookie-policy nil))
 #+end_src
-* window options and keybindings
-#+begin_src emacs-lisp
-  (use-package window
-    :ensure nil
-    :demand t
-    :bind
-    (:map global-map
-	  ("C-x !" . delete-other-windows-vertically)
-	  ("C-x _" . balance-windows)
-	  ("C-x }" . enlarge-window)
-	  ("C-x {" . shrink-window)
-	  ("C-x >" . enlarge-window-horizontally) ;;override scroll-right
-	  ("C-x <" . shrink-window-horizontally) ;;override scroll-left
-	  ("C-x -" . fit-window-to-buffer)
-	  ))
-
-#+end_src
 * Markdown-mode
 #+begin_src emacs-lisp
   (use-package markdown-mode
@@ -863,12 +876,6 @@ emacs with libxml2 support.
     :config
     (setq markdown-fontify-code-blocks-natively t))
 #+end_src
-* Anki-editor
-#+begin_src emacs-lisp
-  (use-package org-anki
-    :ensure t
-    )
-#+end_src
 * Development
 ** Languages
 *** Language Server
@@ -876,41 +883,98 @@ emacs with libxml2 support.
   (use-package lsp-mode
     :ensure t
     :defer t
+    :bind (("C-<tab>" . lsp-ui-doc-show)
+    	 ("C-c TAB" . lsp-ui-doc-focus-frame)
+    	 ("C-c C-r" . lsp-ui-peek-find-references)
+    	 ("C-c o" . lsp-ui-peek-find-definitions))
     :commands (lsp lsp-deferred) ;; lsp mode gets loaded when lsp, lsp-deferred are triggered
-    :init
-    (setq lsp-keymap-prefix "C-c C-l")
     :config
     (lsp-enable-which-key-integration t)
+    (setq lsp-ui-doc-show-with-mouse 1)
     (setq read-process-output-max (* 1024 1024))
-    (setq lsp-ui-sideline-enable nil))
+    (setq lsp-ui-sideline-enable t)
+    :preface
+    (defun lsp-booster--advice-json-parse (old-fn &rest args)
+      "Try to parse bytecode instead of json."
+      (or
+       (when (equal (following-char) ?#)
+         (let ((bytecode (read (current-buffer))))
+  	 (when (byte-code-function-p bytecode)
+             (funcall bytecode))))
+       (apply old-fn args)))
+
+    (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+      "Prepend emacs-lsp-booster command to lsp CMD."
+      (let ((orig-result (funcall old-fn cmd test?)))
+        (if (and (not test?)                             ;; for check lsp-server-present?
+                 (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+                 lsp-use-plists
+                 (not (functionp 'json-rpc-connection))  ;; native json-rpc
+                 (executable-find "emacs-lsp-booster"))
+            (progn
+              (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+                (setcar orig-result command-from-exec-path))
+              (message "Using emacs-lsp-booster for %s!" orig-result)
+              (cons "emacs-lsp-booster" orig-result))
+  	orig-result)))
+
+    :init
+    (advice-add (if (progn (require 'json)
+                           (fboundp 'json-parse-buffer))
+                    'json-parse-buffer
+                  'json-read)
+                :around
+                #'lsp-booster--advice-json-parse)
+    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+
+
+  (use-package lsp-ui
+    :ensure t
+    :hook (lsp-mode . lsp-ui-mode)
+    :after lsp-mode)
+
+
 
 #+end_src
 *** Python
 #+begin_src emacs-lisp
-  (use-package python-mode
-    :mode "\\.py\\'"
-    :hook (python-mode . lsp)
-    :config
-    (setq python-indent-offset 4))
+  (use-package direnv
+      :ensure t
+      :config
+      (direnv-mode))
 
-#+end_src
-*** Php
-#+begin_src emacs-lisp
-  (use-package php-mode
-    :mode "\\.php\\'"
-    :hook (php-mode . lsp-deferred)
-    :config
-    (setq php-indent-level 4))
+  (use-package python-mode
+    :mode ("\\.py\\`" . python-mode)
+    :hook
+    (python-mode . direnv-mode)
+    (python-mode . company-mode)
+    (python-mode . yas-minor-mode))
+
+
+    (use-package lsp-pyright
+    :ensure t
+    :hook
+    (python-mode . (lambda ()
+                     (require 'lsp-pyright)
+                     (lsp-deferred))))
+
 #+end_src
 *** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode
-    :ensure t
+    :ensure t    
     :defer t
-    :mode "\\.rs\\'"
+    :mode ("\\.rs\\'" . rust-mode)
     :hook (rust-mode . lsp-deferred))
 
 #+end_src
+*** C
+#+begin_src emacs-lisp
+  (use-package c-mode
+    :mode ("\\.c\\`" . c-mode)
+    :hook (c-mode . lsp-deferred))
+#+end_
+
 ** Tree sitter
 #+begin_src emacs-lisp
   ;; (setq treesit-language-source-alist
@@ -936,18 +1000,17 @@ emacs with libxml2 support.
 * Company
 #+begin_src emacs-lisp
   (use-package company
-    :ensure t
-    :after lsp-mode
-    :hook (lsp-mode . company-mode)
+    :ensure t      
+    :hook (lsp-mode LaTeX-mode)
     :bind (:map company-active-map
 		("<tab>" . company-complete-selection))
-    (:map lsp-mode-map
-	  ("<tab>" . company-indent-or-complete-common))
-    :custom
+    ;; (:map lsp-mode-map
+    ;; 	("<tab>" . company-indent-or-complete-common))
+    :custom   
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0)
-    )
 
+    )
 #+end_src
 * htmlize
 #+begin_src emacs-lisp
@@ -1045,9 +1108,7 @@ emacs with libxml2 support.
     (setq tmr-sound-file "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga")
     (setq tmr-notification-urgency 'normal)
     (setq tmr-descriptions-list 'tmr-description-history)
-    (define-key global-map "\C-ct" 'tmr)
-    (define-key global-map "\C-cv" 'tmr-tabulated-view)
-    )
+    (define-key global-map "\C-ct" 'tmr))
 #+end_src
 * isearch
 #+begin_src emacs-lisp
@@ -1058,4 +1119,173 @@ emacs with libxml2 support.
     (setq isearch-lazy-highlight t))
 
 #+end_src
+* mydict
+#+begin_src emacs-lisp
+  (use-package dict
+    :ensure nil
+    :load-path "my-dict"
+    :bind
+    ("C-c d d" . my-dict-insert-word)
+    :config
+    (setq my-dict-filename "~/Nextcloud/Notes/languages/english/english.org")
+    )
+#+end_src
+
+* color parenthesis
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t)
+#+end_src
+
+* pdftools
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :init
+    (pdf-tools-install)
+    :ensure
+    :config
+    (defun my-turn-off-line-numbers ()
+      "Disable line numbering in the current buffer."
+      (display-line-numbers-mode -1))
+    (add-hook 'pdf-view-mode-hook #'my-turn-off-line-numbers))
+#+end_src
+
+* project
+#+begin_src emacs-lisp
+  (use-package project
+    :ensure nil
+    :config
+    (setq project-vc-extra-root-markers '(".project")))  
+#+end_src
+
+* kmacro
+#+begin_src emacs-lisp
+  (use-package kmacro
+    :ensure nil
+    :bind(:map global-map
+	       ("C-x e" . kmacro-call-macro)))
+#+end_src
+
+* ispell
+https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
+#+begin_src emacs-lisp
+  (use-package ispell
+    :ensure nil
+    :config
+    (setq ispell-program-name "hunspell")
+    ;; you could set `ispell-dictionary` instead but `ispell-local-dictionary' has higher priority
+    (setq ispell-dictionary "english")
+    (setq ispell-local-dictionary-alist '(("english"
+					   "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
+					   ("-d" "en_US") nil utf-8)
+					  ("el_GR"
+					   "[[:alpha:]]" "[^[:alpha:]]" "[']" nil
+					   ("-d" "el_GR") nil iso-8859-7)
+					  ("greek"
+					   "[[:alpha:]]" "[^[A-Za-z]]" "[']" nil
+					   ("-d" "el_GR_UTF8") nil utf-8)))
+    ;; new variable `ispell-hunspell-dictionary-alist' is defined in Emacs
+    ;; If it's nil, Emacs tries to automatically set up the dictionaries.
+
+    (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist)
+
+    (defun  ispell-switch-dictionary()
+      "Switch greek and english dictionaries."
+      (interactive)
+      (let* ((dict ispell-current-dictionary)
+	     (new (if (string= dict "greek") "english"
+		    "greek")))
+	(ispell-change-dictionary new)
+	(message "Dictionary switched to %s" new)))
+    (define-key global-map (kbd "<f6>") 'ispell-switch-dictionary)
+    )
+#+end_src
+
+* Window
+#+begin_src emacs-lisp
+  (setq display-buffer-alist
+        '(
+    	;; ;; matcher can be a regexp that matches the buffers name as shown bellow
+    	;; ("\\*Python\\*"
+    	;;  ;; list of display functions
+    	;;  (display-buffer-reuse-mode-window display-buffer-below-selected)
+    	;;  ;; (PARAMETER . VALUE)
+    	;;  (window-height . fit-to-window) ;;fit buffer to the size of the window
+    	;;  (dedicated . t)
+    	;;  )
+
+    	;; matcher can also be a major mode
+    	((or . (( derived-mode . compilation-mode)
+    		(derived-mode . inferior-python-mode))) 
+    	 (display-buffer-reuse-mode-window display-buffer-below-selected)
+    	 ;; (PARAMETER . VALUE)
+    	 (window-height . fit-to-window) ;;fit buffer to the size of the window
+    	 (dedicated . t))
+  	))
+
+  ;; windows keys
+  ;; Keybindings for window management
+  (define-key global-map (kbd "C-x C-n") 'next-buffer)
+  (define-key global-map (kbd "C-x C-p") 'previous-buffer)
+  (define-key global-map (kbd "C-x !") 'delete-other-windows-vertically)
+  (define-key global-map (kbd "C-x _") 'balance-windows)
+  (define-key global-map (kbd "C-x }") 'enlarge-window)
+  (define-key global-map (kbd "C-x {") 'shrink-window)
+  (define-key global-map (kbd "C-x >") 'enlarge-window-horizontally)
+  (define-key global-map (kbd "C-x <") 'shrink-window-horizontally)
+  (define-key global-map (kbd "C-x -") 'fit-window-to-buffer)
+
+  ;; Keybindings for resizing windows
+  (define-key resize-window-repeat-map (kbd ">") 'enlarge-window-horizontally)
+  (define-key resize-window-repeat-map (kbd "<") 'shrink-window-horizontally)
+
+  ;; repeat mode
+  (repeat-mode 1)
+  (blink-cursor-mode -1)
+
+  ;; works for opening link in the same buffer with org-open-at-point
+  (setq org-link-frame-setup '((file . find-file)))
+
+#+end_src
+
+* move text
+#+begin_src emacs-lisp
+  (use-package move-text
+    :ensure t
+    :bind
+    ("M-p" . move-text-up)
+    ("M-n" . move-text-down))
+#+end_src
+* gptel
+#+begin_src emacs-lisp
+  (use-package gptel
+    :ensure t
+    :config
+    (setq gptel-api-key (gptel-api-key-from-auth-source))
+    (setq gptel-model "Chat-GPT:gpt-4o")
+    )
+#+end_src
+* ox-hugo
+#+begin_src emacs-lisp
+  (use-package ox-hugo
+    :ensure t
+    :pin melpa
+    :after ox
+    :config
+    (setq org-hugo-base-dir "~/Projects/blog")
+    (setq org-hugo-default-section-directory "posts")
+    )
+#+end_src
+* treemacs
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :bind ("C-c p" . treemacs-add-and-display-current-project)
+    :config
+    (setq treemacs-follow-mode t))
+#+end_src
+
+
+
 
