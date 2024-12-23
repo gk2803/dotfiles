@@ -28,3 +28,19 @@ Locate the installation path
   git clone https://github.com/blahgeek/emacs-lsp-booster
   sudo ln -s ~/sources/emacs-lsp-booster/target/release/emacs-lsp-booster /usr/local/bin/emacs-lsp-booster
 #+end_src
+* lsp-latex
+lsp-latex repo
+#+begin_src sh
+  git clone https://github.com/ROCKTAKEY/lsp-latex
+#+end_src
+
+
+#+begin_src sh
+  git clone https://github.com/latex-lsp/texlab
+  cd texlab
+  cargo run
+  
+#+end_src
+add =/texlab/debug/target/texlab= to your path
+
+
