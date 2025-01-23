@@ -35,7 +35,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(lsp-pyright ox-hugo python-pytest pyvenv direnv python-mode org-habit-stats gptel org-mode))
+   '(ox-hugo python-pytest pyvenv direnv python-mode org-habit-stats gptel org-mode))
  '(package-vc-selected-packages '((org-mode :url "https://code.tecosaur.net/tec/org-mode"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

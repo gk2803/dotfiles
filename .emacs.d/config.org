@@ -42,11 +42,13 @@ requires =cmake= and =libvterm-dev=
   (global-display-line-numbers-mode) ;; I have no Idea what this is
 
   ;; global keybindings
-					  ;(global-set-key (kbd "C-c a") 'beginning-of-buffer)
-					  ; (global-set-key (kbd "C-c e") 'end-of-buffer)
+  					  ;(global-set-key (kbd "C-c a") 'beginning-of-buffer)
+  					  ; (global-set-key (kbd "C-c e") 'end-of-buffer)
   (global-set-key (kbd "M--") 'count-words)
   (global-set-key (kbd "M-o") 'mode-line-other-buffer)
   (global-set-key (kbd "C-x k") 'kill-current-buffer)
+
+  (set-face-attribute 'default nil :height  150)
 
 
 
@@ -763,13 +765,6 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       "cpv" '(yas "\\cp{V}")
       ))
 #+end_src
-** lsp-lpatex
-#+begin_src emacs-lisp
-  (use-package lsp-latex
-    :ensure t
-    :hook((tex-mode . lsp)
-  	(LaTeX-mode . lsp)))
-#+end_src
 
 * YASnippet
 #+begin_src emacs-lisp
@@ -883,11 +878,12 @@ emacs with libxml2 support.
   (use-package lsp-mode
     :ensure t
     :defer t
-    :bind (("C-<tab>" . lsp-ui-doc-show)
-    	 ("C-c TAB" . lsp-ui-doc-focus-frame)
+    :bind (("C-c C-<tab>" . lsp-ui-doc-show)
+    	 ("C-<tab>" . lsp-ui-doc-focus-frame)
     	 ("C-c C-r" . lsp-ui-peek-find-references)
     	 ("C-c o" . lsp-ui-peek-find-definitions))
     :commands (lsp lsp-deferred) ;; lsp mode gets loaded when lsp, lsp-deferred are triggered
+    :hook (LaTeX-mode . lsp-deferred)
     :config
     (lsp-enable-which-key-integration t)
     (setq lsp-ui-doc-show-with-mouse 1)
@@ -968,6 +964,18 @@ emacs with libxml2 support.
     :hook (rust-mode . lsp-deferred))
 
 #+end_src
+*** Latex
+#+begin_src emacs-lisp
+  (use-package lsp-latex
+       ;; this uses texlab
+       :ensure t
+       :config
+       (progn
+         (add-hook 'bibtex-mode-hook 'lsp)
+         )
+       )
+#+end_src
+
 *** C
 #+begin_src emacs-lisp
   (use-package c-mode
