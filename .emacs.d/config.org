@@ -883,8 +883,8 @@ emacs with libxml2 support.
   (use-package lsp-mode
     :ensure t
     :defer t
-    :bind (("C-<tab>" . lsp-ui-doc-show)
-    	 ("C-c TAB" . lsp-ui-doc-focus-frame)
+    :bind (("C-c C-<tab>" . lsp-ui-doc-show)
+    	 ("C-<tab>" . lsp-ui-doc-focus-frame)
     	 ("C-c C-r" . lsp-ui-peek-find-references)
     	 ("C-c o" . lsp-ui-peek-find-definitions))
     :commands (lsp lsp-deferred) ;; lsp mode gets loaded when lsp, lsp-deferred are triggered
@@ -966,15 +966,13 @@ emacs with libxml2 support.
     :defer t
     :mode ("\\.rs\\'" . rust-mode)
     :hook (rust-mode . lsp-deferred))
-
 #+end_src
 *** C
 #+begin_src emacs-lisp
   (use-package c-mode
     :mode ("\\.c\\`" . c-mode)
     :hook (c-mode . lsp-deferred))
-#+end_
-
+#+end_src
 ** Tree sitter
 #+begin_src emacs-lisp
   ;; (setq treesit-language-source-alist
@@ -1281,7 +1279,8 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
 #+begin_src emacs-lisp
   (use-package treemacs
     :ensure t
-    :bind ("C-c p" . treemacs-add-and-display-current-project)
+    :bind (("C-c p" . treemacs-add-and-display-current-project)
+  	 ("M-0" . treemacs-select-window))
     :config
     (setq treemacs-follow-mode t))
 #+end_src
