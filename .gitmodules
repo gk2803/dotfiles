@@ -1,0 +1,3 @@
+[submodule "my-dict"]
+	path = .emacs.d/my-dict
+	url = https://github.com/gk2803/dict
