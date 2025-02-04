@@ -1,3 +1,6 @@
 [submodule ".emacs.d/emacs-htmlize"]
 	path = .emacs.d/emacs-htmlize
 	url = https://github.com/hniksic/emacs-htmlize
+[submodule "my-dict"]
+	path = .emacs.d/my-dict
+	url = https://github.com/gk2803/dict
