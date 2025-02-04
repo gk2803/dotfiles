@@ -540,15 +540,6 @@ called?
 
     (setq denote-commands-for-new-notes '(denote my-denote-zk my-denote-reference))
 
-      (defun my-denote-curated ()
-	"Create a curated Note, a well established thought, an article"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("curated"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
 
       (defun my-denote-curated ()
 	"Create a curated Note, a well established thought, an article"
