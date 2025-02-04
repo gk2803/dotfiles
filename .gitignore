@@ -12,4 +12,6 @@
 !rofi/config.rasi
 !sxhkd/sxhkdrc
 !darkman/*
-!.emacs.d/my-dict/dict.el
+!.emacs.d/my-dict
+!.emacs.d/my-dict/
+!.emacs.d/my-dict/*
