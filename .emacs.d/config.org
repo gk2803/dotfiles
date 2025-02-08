@@ -549,17 +549,7 @@ called?
 	      (denote-infer-keywords nil)
 	      (denote-known-keywords '("curated"))
 	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
-
-      ;; referecnce: 13. Keep a journal or diary
-      ;; added org-anki-journal in the front matter 
-      (defun my-denote-tech-journal-new-or-existing-entry()
-	"Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
-	(interactive)
-	(let ((denote-journal-extras-keyword "techjournal")
-	      (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-	      (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n")))
-	  (call-interactively 'denote-journal-extras-new-or-existing-entry))))
+	  (call-interactively 'denote))))
 #+end_src
 * Dired
 ** basic config
