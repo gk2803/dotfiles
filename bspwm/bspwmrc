@@ -19,5 +19,5 @@ dunst &
 $HOME/.config/polybar/launch.sh &
 nm-applet &
 nextcloud &
-
+darkman run &
 

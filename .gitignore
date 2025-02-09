@@ -41,4 +41,8 @@ xarchiver/
 xfce4/
 xournalpp/
 xsettingsd/
+systemd/
+kdeglobals
+kdenlive-appimagerc
+kdenlive-layoutsrc
 zathura
