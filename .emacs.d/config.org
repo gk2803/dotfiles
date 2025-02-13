@@ -50,6 +50,9 @@ requires =cmake= and =libvterm-dev=
 
   (set-face-attribute 'default nil :height  150)
 
+  ;;error handling
+  (setq warning-minimum-level :error)
+
 
 
 #+end_src
@@ -769,7 +772,7 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       :cond #'laas-object-on-left-condition
       "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))
       :cond (lambda() (not (texmathp))) ;;expand when not in math 
-      "fm" '(yas "\\\\( $1 \\\\)")
+      "fm" '(yas "\\\\($1\\\\)")
       "cpp" (lambda () (interactive)
   	    (yas-expand-snippet
   	      (yas-lookup-snippet 'cpp 'LaTeX-mode)))
@@ -1307,8 +1310,27 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
       :config
       (treemacs-follow-mode 1))
 #+end_src  
+* quelpa
+#+begin_src emacs-lisp
+  (use-package quelpa
+    :ensure t)
+  (use-package quelpa-use-package
+  :ensure t
+  :init
+  (setq quelpa-update-melpa-p nil)
+  (setq quelpa-self-upgrade-p nil))
 
-
-
-
+#+end_src
+* copilot
+#+begin_src emacs-lisp
+    (use-package copilot
+      :quelpa (copilot :fetcher github
+                       :repo "copilot-emacs/copilot.el"
+                       :branch "main"
+                       :files ("*.el"))
+      :config
+      (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+      (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+      )
+#+end_src
 
