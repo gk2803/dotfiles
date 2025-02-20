@@ -546,7 +546,7 @@ called?
     ;; see https://protesilaos.com/codelog/2022-10-30-demo-denote-custom-file-type/
 
     (setq denote-commands-for-new-notes '(denote my-denote-zk my-denote-reference))
-      
+
 
       (defun my-denote-curated ()
 	"Create a curated Note, a well established thought, an article"
@@ -556,17 +556,7 @@ called?
 	      (denote-infer-keywords nil)
 	      (denote-known-keywords '("curated"))
 	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote)))
-
-      ;; referecnce: 13. Keep a journal or diary
-      ;; added org-anki-journal in the front matter 
-      (defun my-denote-tech-journal-new-or-existing-entry()
-	"Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
-	(interactive)
-	(let ((denote-journal-extras-keyword "techjournal")
-	      (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-	      (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n")))
-	  (call-interactively 'denote-journal-extras-new-or-existing-entry))))
+	  (call-interactively 'denote))))
 #+end_src
 * Dired
 ** basic config
@@ -720,26 +710,27 @@ check if we need to go further.
 * Latex
 ** Auctex
 #+begin_src emacs-lisp
-  (use-package auctex
-    :ensure t    
-    :config
-    (setq-default TeX-master nil)
-    (setq TeX-auto-save t)
-    (setq TeX-parse-self t)
-    ;; if you often use \include or \input, make AUCTEX aware of the multifile doc structure
-    ;; https://www.gnu.org/software/auctex/manual/auctex/Multifile.html
-    ;; set pdf tools as the default auctex pdf viewer
-    (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-    (setq TeX-source-correlate-start-server t)
-    (setq LaTeX-default-options "a4paper,12pt,draft")
-    ;; automatically insert the other pair of a bracket
-    (setq LaTeX-electric-left-right-brace nil)
-
-    ;; no prettified SHIT
-    (setq font-latex-fontify-script nil)
-    (setq font-latex-math-environments nil)
-    ;; update pdf tools buffer
-    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)) 
+    (use-package auctex
+      :ensure t    
+      :config
+      (setq-default TeX-master nil)
+      (setq TeX-auto-save t)
+      (setq TeX-parse-self t)
+      ;; if you often use \include or \input, make AUCTEX aware of the multifile doc structure
+      ;; https://www.gnu.org/software/auctex/manual/auctex/Multifile.html
+      ;; set pdf tools as the default auctex pdf viewer
+      (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+      (setq TeX-source-correlate-start-server t)
+      (setq LaTeX-default-options "a4paper,12pt,draft")
+      ;; automatically insert the other pair of a bracket
+      (setq LaTeX-electric-left-right-brace nil)
+      
+      ;; no prettified SHIT
+      (setq font-latex-fontify-script nil)
+      (setq font-latex-math-environments nil)
+      ;; update pdf tools buffer
+      (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+      ) 
 #+end_src
 ** LaTeX-auto-activating-snippets (laas)
 :PROPERTIES:
@@ -751,11 +742,12 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
   (use-package laas
     :ensure t
     :hook (( LaTeX-mode . laas-mode)
-	   (org-mode . laas-mode))
+  	   (org-mode . laas-mode))
 
     :config ; do whatever here
     (aas-set-snippets 'laas-mode 
       ;; set condition!
+      "tl" '(yas "\\en{$1} $0")
       :cond #'texmathp ;; expand only while in math
       "lim" '(yas "\\lim_{x\\to\\infty} $0")
       "cap" '(yas "\\cap$1")		      
@@ -775,18 +767,23 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       "sq" '(yas "\\sqrt{$1} $0")		      
       ;; bind to functions!
       "Sum" (lambda () (interactive)
-	      (yas-expand-snippet "\\sum_{n=$1}^{$2} $0"))
+  	      (yas-expand-snippet "\\sum_{n=$1}^{$2} $0"))
       "Prod" (lambda () (interactive)
-	       (yas-expand-snippet "\\prod_{$1}^{$2} $0"))
+  	       (yas-expand-snippet "\\prod_{$1}^{$2} $0"))
       "Span" (lambda () (interactive)
-	       (yas-expand-snippet "\\Span($1)$0"))
+  	       (yas-expand-snippet "\\Span($1)$0"))
+
       ;; add accent snippets
       :cond #'laas-object-on-left-condition
       "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))
       :cond (lambda() (not (texmathp))) ;;expand when not in math 
       "fm" '(yas "\\\\($1\\\\)")
-      "cpp" '(yas "\\cp{P}")
-      "cpv" '(yas "\\cp{V}")
+      "cpp" (lambda () (interactive)
+  	    (yas-expand-snippet
+  	      (yas-lookup-snippet 'cpp 'LaTeX-mode)))
+      "cpv" (lambda () (interactive)
+  	    (yas-expand-snippet
+  	      (yas-lookup-snippet 'cpv 'LaTeX-mode)))
       ))
 #+end_src
 
@@ -1003,8 +1000,12 @@ emacs with libxml2 support.
 *** C
 #+begin_src emacs-lisp
   (use-package cc-mode
+    :ensure nil
     :mode ("\\.c\\`" . c-mode)
-    :hook (c-mode . lsp-deferred))
+    :hook (c-mode . lsp-deferred)
+    :config
+    (setq c-default-style "k&r"))
+
 #+end_src
 
 ** Tree sitter
@@ -1295,7 +1296,7 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     :ensure t
     :config
     (setq gptel-api-key (gptel-api-key-from-auth-source))
-    (setq gptel-model "Chat-GPT:gpt-4o")
+    (setq gptel-model "ChatGPT:gpt-4o")
     )
 #+end_src
 * ox-hugo
@@ -1318,8 +1319,27 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
       :config
       (treemacs-follow-mode 1))
 #+end_src  
+* quelpa
+#+begin_src emacs-lisp
+  (use-package quelpa
+    :ensure t)
+  (use-package quelpa-use-package
+  :ensure t
+  :init
+  (setq quelpa-update-melpa-p nil)
+  (setq quelpa-self-upgrade-p nil))
 
-
-
-
+#+end_src
+* copilot
+#+begin_src emacs-lisp
+    (use-package copilot
+      :quelpa (copilot :fetcher github
+                       :repo "copilot-emacs/copilot.el"
+                       :branch "main"
+                       :files ("*.el"))
+      :config
+      (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+      (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+      )
+#+end_src
 
