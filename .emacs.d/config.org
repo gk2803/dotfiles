@@ -50,6 +50,13 @@ requires =cmake= and =libvterm-dev=
 
   (set-face-attribute 'default nil :height  150)
 
+  ;;error handling
+  (setq warning-minimum-level :error)
+
+  ;;git
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
 
 
 #+end_src
