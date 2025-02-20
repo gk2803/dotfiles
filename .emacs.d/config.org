@@ -743,6 +743,7 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
     :config ; do whatever here
     (aas-set-snippets 'laas-mode 
       ;; set condition!
+      "tl" '(yas "\\en{$1} $0")
       :cond #'texmathp ;; expand only while in math
       "lim" '(yas "\\lim_{x\\to\\infty} $0")
       "cap" '(yas "\\cap$1")		      
@@ -994,10 +995,14 @@ emacs with libxml2 support.
 
 *** C
 #+begin_src emacs-lisp
-  (use-package c-mode
+  (use-package cc-mode
+    :ensure nil
     :mode ("\\.c\\`" . c-mode)
-    :hook (c-mode . lsp-deferred))
-#+end_
+    :hook (c-mode . lsp-deferred)
+    :config
+    (setq c-default-style "k&r"))
+
+#+end_src
 
 ** Tree sitter
 #+begin_src emacs-lisp
@@ -1287,7 +1292,7 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     :ensure t
     :config
     (setq gptel-api-key (gptel-api-key-from-auth-source))
-    (setq gptel-model "Chat-GPT:gpt-4o")
+    (setq gptel-model "ChatGPT:gpt-4o")
     )
 #+end_src
 * ox-hugo

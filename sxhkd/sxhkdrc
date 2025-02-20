@@ -5,7 +5,13 @@ super + shift + t
 # launch firefox
 super + shift + f
       firefox
-	
+
+# brightness
+super + F5
+      brightnessctl set 10%-
+
+super + F6
+      brightnessctl set +10%
 #emacs
 super + e
       bash -ci emacs      
@@ -74,7 +80,7 @@ super + {p,b,comma,period}
 	bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous window in the current desktop
-super + {_,shift + }c
+super + {_,shift + }n
 	bspc node -f {next,prev}.local.!hidden.window
 
 # focus the next/previous desktop in the current monitor
