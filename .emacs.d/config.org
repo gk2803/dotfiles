@@ -995,10 +995,10 @@ emacs with libxml2 support.
 
 *** C
 #+begin_src emacs-lisp
-  (use-package c-mode
+  (use-package cc-mode
     :mode ("\\.c\\`" . c-mode)
     :hook (c-mode . lsp-deferred))
-#+end_
+#+end_src
 
 ** Tree sitter
 #+begin_src emacs-lisp

@@ -153,7 +153,7 @@ export PATH=/home/rqd3/.nvm/versions/node/v20.18.0/bin:/home/rqd3/.pyenv/shims:/
 export QT_QPA_PLATFORMTHEME=qt5ct
 
 
-
+# foundry?
 export PATH="$PATH:/home/rqd3/.foundry/bin"
 
 
