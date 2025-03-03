@@ -26,7 +26,7 @@ super + shift + e
 
 # rofi
 super + r
-      rofi -show combi -combi-modes "window, run"
+      rofi -show drun
       
       
 # make sxhkd reload its configuration files:

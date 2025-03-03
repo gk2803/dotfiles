@@ -11,8 +11,7 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-(use-package org
-    :load-path "~/.emacs.d/elpa/org-mode/lisp/")
+
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
 
 
