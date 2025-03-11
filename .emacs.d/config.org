@@ -990,8 +990,7 @@ emacs with libxml2 support.
   (use-package cc-mode
   :ensure nil
   :mode ("\\.c\\'" . c-mode)
-  :hook ((c-mode . lsp-deferred)
-         (c-mode . tree-sitter-mode))
+  :hook (c-mode . lsp-deferred)
   :config
   (setq c-default-style "k&r")
   :bind (:map c-mode-map
@@ -1106,13 +1105,14 @@ emacs with libxml2 support.
 * tmr
 #+begin_src emacs-lisp
   ;; https://protesilaos.com/emacs/tmr
+  ;; this depends on the ffmpeg lib.
   (use-package tmr
     :ensure t  
     :config
     (setq tmr-sound-file "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga")
     (setq tmr-notification-urgency 'normal)
     (setq tmr-descriptions-list 'tmr-description-history)
-    (define-key global-map "\C-ct" 'tmr))
+    (define-key global-map "\C-ct" 'tmr))  
 #+end_src
 * isearch
 #+begin_src emacs-lisp
