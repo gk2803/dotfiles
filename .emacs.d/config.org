@@ -998,6 +998,15 @@ emacs with libxml2 support.
 
 #+end_src
 
+*** go 
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :defer t
+    :mode("\\.go\\'" . go-mode)
+    :hook (go-mode . lsp-deferred))
+#+end_src
+
 ** Tree sitter
 
 * Company
@@ -1267,7 +1276,7 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     :ensure t
     :config
     (setq gptel-api-key (gptel-api-key-from-auth-source))
-    (setq gptel-model "ChatGPT:gpt-4o")
+    (setq gptel-model "gpt-4o")
     )
 #+end_src
 * ox-hugo

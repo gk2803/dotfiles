@@ -136,3 +136,4 @@ export PATH="$PATH:$PYENV_ROOT/bin"
 eval "$(pyenv init -)"
 eval "$(direnv hook bash)"
 PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux/"
+PATH=/home/rqd3/.pyenv/shims:/home/rqd3/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/snap/bin:~/.local/bin:/usr/bin/:/home/rqd3/.pyenv/bin:/usr/local/texlive/2024/bin/x86_64-linux/:/usr/local/go/bin
