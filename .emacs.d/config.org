@@ -415,12 +415,12 @@ called?
     (setq denote-directory '"~/Nextcloud/Documents/publicNotes")
     :bind
     (:map global-map
-	  ("C-c n j" . denote-journal-extras-new-or-existing-entry)
-	  ("C-c n r" . my-denote-reference)
-	  ("C-c n i" . my-denote-inbox)
-	  ("C-c n n" . my-denote-zk)
-	  ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
-	  )	  
+      	("C-c n j" . denote-journal-extras-new-or-existing-entry)
+      	("C-c n r" . my-denote-reference)
+      	("C-c n i" . my-denote-inbox)
+      	("C-c n n" . my-denote-zk)
+      	("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
+      	)	  
     :config
     ;; set the order of denote naming scheme
     (setq denote-file-name-components-order '(identifier signature title keywords ))
@@ -428,80 +428,82 @@ called?
     ;; Variant of `my-denote-region' to reference the source
     (defun my-denote-region-get-source-reference ()
       "Get a reference to the source for use with `my-denote-region'.
-       The reference is a URL or an Org-formatted link to a file."
+           The reference is a URL or an Org-formatted link to a file."
       ;; We use a `cond' here because we can extend it to cover more
       ;; cases.
       (cond
        ((derived-mode-p 'eww-mode)
-	(plist-get eww-data :url))
+        (plist-get eww-data :url))
        ;; Here we are just assuming an Org format.  We can make this more
        ;; involved, if needed.
        (buffer-file-name
-	(format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
+        (format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
 
     (defun my-denote-region (&optional lst)
       "Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
-			    If LST is not provided, use the default list '(title signature)."
+      			    If LST is not provided, use the default list '(title signature)."
       (declare (interactive-only t))
       (interactive)
       (let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
-	(if-let (((region-active-p)) 
-		 ;; Capture the text early, otherwise it will be empty
-		 ;; the moment `insert` is called.
-		 (text (buffer-substring-no-properties (region-beginning) (region-end))))
-	    (progn
-	      (let ((denote-ignore-region-in-denote-command t))
-		(call-interactively #'denote))
-	      (push-mark (point))
-	      (insert text)
-	      (run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
-	  ;; If no region is active, just call `denote` with the prompt list.
-	  (call-interactively #'denote))))
+        (if-let (((region-active-p)) 
+      	       ;; Capture the text early, otherwise it will be empty
+      	       ;; the moment `insert` is called.
+      	       (text (buffer-substring-no-properties (region-beginning) (region-end))))
+      	  (progn
+      	    (let ((denote-ignore-region-in-denote-command t))
+      	      (call-interactively #'denote))
+      	    (push-mark (point))
+      	    (insert text)
+      	    (run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
+      	;; If no region is active, just call `denote` with the prompt list.
+      	(call-interactively #'denote))))
 
     (defun my-denote-region-with-reference-zk ()
       "Like `denote-region', but add the context afterwards.
-				For how the context is retrieved, see `my-denote-region-get-source-reference'."
+      				For how the context is retrieved, see `my-denote-region-get-source-reference'."
       (interactive)
       (let ((context (my-denote-region-get-source-reference))
-	    (denote-directory "~/Nextcloud/Documents/publicNotes/")
-	    (denote-file-name-components-order '(signature title keywords identifier)))
-	(my-denote-region '(signature title keywords))
-	(when context
-	  (goto-char (point-max))
-	  (insert "\n")
-	  (insert context))))
+      	  (denote-directory "~/Nextcloud/Documents/publicNotes/")
+      	  (denote-file-name-components-order '(signature title keywords identifier)))
+        (my-denote-region '(signature title keywords))
+        (when context
+      	(goto-char (point-max))
+      	(insert "\n")
+      	(insert context))))
 
     (defun my-denote-zk ()
       "Like `denote', but with the prompts order of `my-denote-zk'"
       (declare (interactive-only t))
       (interactive)
       (let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
-	    (denote-file-name-components-order '(signature title keywords identifier))
-	    (denote-prompts '(signature title keywords)))
-	(call-interactively 'denote)))
+      	  (denote-file-name-components-order '(signature title keywords identifier))
+      	  (denote-prompts '(signature title keywords)))
+        (call-interactively 'denote)))
 
     (defun my-denote-region-with-reference-reference ()
       "Like `my-denote-region-with-reference-zk' but saved as a `reference'
-       and has no signature"
+           and has no signature"
       (interactive)
       (let ((context (my-denote-region-get-source-reference))
-	    (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
-	(my-denote-region '(title keywords))
-	(when context
-	  (goto-char (point-max))
-	  (insert "\n")
-	  (insert context))))
+      	  (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
+        (my-denote-region '(title keywords))
+        (when context
+      	(goto-char (point-max))
+      	(insert "\n")
+      	(insert context))))
 
     (defun my-denote-inbox ()
       "Create a simple post note, something you might want to remember,
-       everything goes"
+           everything goes"
       (declare (interactive-only t))
       (interactive)
       (let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
-	    (denote-infer-keywords nil)
-	    (denote-known-keywords '("fleeting"))
-	    (denote-prompts '(title keywords)))
-	(call-interactively 'denote)))
+      	  (denote-infer-keywords nil)
+      	  (denote-prompts '())
+    	  (denote-org-front-matter
+  	   "#+date:       %2$s \n#+identifier: %4$s
+       \n"))
+        (call-interactively 'denote)))
 
 
     (defun my-denote-reference ()
@@ -509,26 +511,27 @@ called?
       (declare (interactive-only t))
       (interactive)
       (let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
-	    (denote-infer-keywords nil)
-	    (denote-known-keywords '("reference" "book"))
-	    (denote-prompts '(title keywords)))
-	(call-interactively 'denote)))
+      	  (denote-infer-keywords nil)
+      	  (denote-known-keywords '("reference" "book"))
+      	  (denote-prompts '(title keywords))
+      	  )
+        (call-interactively 'denote)))
 
-      (defun my-denote-zk ()
-	"Create the main zettelkasten note"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
-	      (denote-prompts '(signature title keywords))
-	      (denote-file-name-components-order '(signature title keywords identifier)))
-	  (call-interactively 'denote)))
+    (defun my-denote-zk ()
+      "Create the main zettelkasten note"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
+      	  (denote-prompts '(signature title keywords))
+      	  (denote-file-name-components-order '(signature title keywords identifier)))
+        (call-interactively 'denote)))
 
     (defun my-denote-rename-file-signature ()
       "rename file using the naming convention I use on my zk notes"
       (declare (interactive-only t))
       (interactive)
       (let ((denote-file-name-components-order '(signature title keywords identifier)))
-	(call-interactively 'denote-rename-file-signature)))
+        (call-interactively 'denote-rename-file-signature)))
 
     ;; reference: 13. Keep a journal or diary
     ;; added org-anki-journal in the front matter 
@@ -536,9 +539,9 @@ called?
       "Like `denote-journal-extras-new-or-existing-entry' using the corresponding tech journal directory instead"
       (interactive)
       (let ((denote-journal-extras-keyword "techjournal")
-	    (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-	    (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n\n* Anki Headers\n\n* Journal")))
-	(call-interactively 'denote-journal-extras-new-or-existing-entry)))
+      	  (denote-journal-extras-directory "~/Nextcloud/Documents/publicNotes/tech journal")
+      	  (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n\n* Anki Headers\n\n* Journal")))
+        (call-interactively 'denote-journal-extras-new-or-existing-entry)))
 
     ;; shell file type configuration
     ;; `denote-file-type' is an alist that holds the configuration options
@@ -548,15 +551,15 @@ called?
     (setq denote-commands-for-new-notes '(denote my-denote-zk my-denote-reference))
 
 
-      (defun my-denote-curated ()
-	"Create a curated Note, a well established thought, an article"
-	(declare (interactive-only t))
-	(interactive)
-	(let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
-	      (denote-infer-keywords nil)
-	      (denote-known-keywords '("curated"))
-	      (denote-prompts '(title keywords)))
-	  (call-interactively 'denote))))
+    (defun my-denote-curated ()
+      "Create a curated Note, a well established thought, an article"
+      (declare (interactive-only t))
+      (interactive)
+      (let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
+      	  (denote-infer-keywords nil)
+      	  (denote-known-keywords '("curated"))
+      	  (denote-prompts '(title keywords)))
+        (call-interactively 'denote))))
 #+end_src
 * Dired
 ** basic config
@@ -607,14 +610,14 @@ we have something like ~2024-06-30 01:15~ to show the last modified time
     :ensure nil
     :commands (dired)
     :bind (:map dired-mode-map
-		("C-o" . dired-preview-mode)) ;; toggles prot's preview-mode
+  		("C-o" . dired-preview-mode)) ;; toggles prot's preview-mode
     :config
     (setq dired-recursive-copies 'always)
     (setq dired-recursive-deletes 'always)
     (setq delete-by-moving-to-trash t)
     (setq dired-listing-switches ;; I have disabled the -v flag because
-	  ;; freebsd doesnt have that option
-	  "-AFGhlv --group-directories-first --time-style=long-iso"))
+  	  ;; freebsd doesnt have that option
+  	  "-AFGhl --group-directories-first --time-style=long-iso"))
 
 #+end_src
 
@@ -747,7 +750,7 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
     :config ; do whatever here
     (aas-set-snippets 'laas-mode 
       ;; set condition!
-      "tl" '(yas "\\en{$1} $0")
+      "tl" '(yas "\\en{$1}$0")
       :cond #'texmathp ;; expand only while in math
       "lim" '(yas "\\lim_{x\\to\\infty} $0")
       "cap" '(yas "\\cap$1")		      
@@ -829,7 +832,7 @@ change the theme based on the sunset and sunrise times.
     :ensure t
     :demand t
     :bind (("<f5>" . modus-themes-toggle)
-	   ("C-<f5>" . modus-themes-select))
+  	   ("C-<f5>" . modus-themes-select))
     :config
 
     (defun my-dark-theme-p()
@@ -839,13 +842,12 @@ change the theme based on the sunset and sunrise times.
        (shell-command-to-string "cat ~/.config/xsettingsd/xsettingsd.conf |grep Net/ThemeName")))
 
     (if (my-dark-theme-p) 
-	(modus-themes-load-theme 'modus-vivendi)
+  	(modus-themes-load-theme 'modus-vivendi)
       (modus-themes-load-theme 'modus-operandi))
 
-
+  	
     (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
 #+end_src
-
 * RSS/Atom 
 #+begin_src emacs-lisp
   (use-package elfeed
@@ -1296,7 +1298,7 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     :ensure t
     :config
     (setq gptel-api-key (gptel-api-key-from-auth-source))
-    (setq gptel-model "ChatGPT:gpt-4o")
+    (setq gptel-model "gpt-4o")
     )
 #+end_src
 * ox-hugo
@@ -1307,7 +1309,7 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     :after ox
     :config
     (setq org-hugo-base-dir "~/Projects/blog")
-    (setq org-hugo-default-section-directory "posts")
+    (setq org-hugo-section "posts")
     )
 #+end_src
 * treemacs

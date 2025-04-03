@@ -139,7 +139,6 @@ export PATH="$PATH:/usr/bin/"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PATH:$PYENV_ROOT/bin"
 eval "$(pyenv init -)"
-export PATH="$PATH:/usr/local/texlive/2024/bin/x86_64-linux"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -159,3 +158,8 @@ export PATH="$PATH:/home/rqd3/.foundry/bin"
 
 
 
+export TEXLIVE_INSTALL_PREFIX=/usr/local/texlive/2025
+export PATH=/usr/local/texlive/2025/bin/x86_64-linux:$PATH
+export MANPATH=/usr/local/texlive/2025/texmf-dist/doc/man:$MANPATH
+export INFOPATH=/usr/local/texlive/2025/texmf-dist/doc/info:$INFOPATH
+export PERL5LIB=/usr/local/texlive/2025/tlpkg
