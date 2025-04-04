@@ -20,5 +20,5 @@ $HOME/.config/polybar/launch.sh &
 nm-applet &
 nextcloud &
 darkman --daemon &
-
+emacs --daemon &
 
