@@ -6,9 +6,16 @@ super + F5
 super + shift + f
       firefox
 	
-#emacs
+# emacs
+# interactive mode is necessary in order to obtain the environmental variables of the bashrc
 super + e
-      bash -ci 'emacsclient -c -a "emacs"'
+      bash -ci 'emacsclient -c -a "emacs"' 
+
+super + c
+      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-org-capture)'
+
+super + i
+      bspc rule -a Emacs state=floating && emacsclient -e "(my-window-popup-my-denote-inbox)"
       
 # terminal
 super + Return
@@ -85,10 +92,10 @@ super + {grave,Tab}
 	bspc {node,desktop} -f last
 
 # focus the older or newer node in the focus history
-super + {o,i}
-	bspc wm -h off; \
-	bspc node {older,newer} -f; \
-	bspc wm -h on
+#super + {o,i}
+#	bspc wm -h off; \
+#	bspc node {older,newer} -f; \
+#	bspc wm -h on
 
 # focus or send to the given desktop
 super + {_,shift + }{1-9,0}
@@ -131,4 +138,6 @@ super + {Left,Down,Up,Right}
 	bspc node -v {-20 0,0 20,0 -20,20 0}	
 
 
-
+# Rotating window trees
+super + shift + {d,a}
+    bspc node @/ -C {forward,backward}

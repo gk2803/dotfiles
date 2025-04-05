@@ -231,6 +231,7 @@ a gateway to our individual notes.
 #+begin_src emacs-lisp
   (use-package org-agenda
     :ensure nil
+    :defer t
     :bind ("C-c A" . org-agenda)
     :config
     (setq org-agenda-include-diary t)
@@ -322,7 +323,6 @@ a gateway to our individual notes.
     (setq org-habit-preceding-days 9)
     (setq org-habit-show-all-today t)
     )
-
 #+end_src
 ** Org Bullets Package
 prettifies org-mode 
@@ -1241,23 +1241,23 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
 #+begin_src emacs-lisp
   (setq display-buffer-alist
         '(
-    	;; ;; matcher can be a regexp that matches the buffers name as shown bellow
-    	;; ("\\*Python\\*"
-    	;;  ;; list of display functions
-    	;;  (display-buffer-reuse-mode-window display-buffer-below-selected)
-    	;;  ;; (PARAMETER . VALUE)
-    	;;  (window-height . fit-to-window) ;;fit buffer to the size of the window
-    	;;  (dedicated . t)
-    	;;  )
+          ;; ;; matcher can be a regexp that matches the buffers name as shown bellow
+          ;; ("\\*Python\\*"
+          ;;  ;; list of display functions
+          ;;  (display-buffer-reuse-mode-window display-buffer-below-selected)
+          ;;  ;; (PARAMETER . VALUE)
+          ;;  (window-height . fit-to-window) ;;fit buffer to the size of the window
+          ;;  (dedicated . t)
+          ;;  )
 
-    	;; matcher can also be a major mode
-    	((or . (( derived-mode . compilation-mode)
-    		(derived-mode . inferior-python-mode))) 
-    	 (display-buffer-reuse-mode-window display-buffer-below-selected)
-    	 ;; (PARAMETER . VALUE)
-    	 (window-height . fit-to-window) ;;fit buffer to the size of the window
-    	 (dedicated . t))
-  	))
+          ;; matcher can also be a major mode
+          ((or . (( derived-mode . compilation-mode)
+                  (derived-mode . inferior-python-mode))) 
+           (display-buffer-reuse-mode-window display-buffer-below-selected)
+           ;; (PARAMETER . VALUE)
+           (window-height . fit-to-window) ;;fit buffer to the size of the window
+           (dedicated . t))
+          ))
 
   ;; windows keys
   ;; Keybindings for window management
@@ -1281,6 +1281,42 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
 
   ;; works for opening link in the same buffer with org-open-at-point
   (setq org-link-frame-setup '((file . find-file)))
+
+  ;; calling emacs frame outside emacs
+  (defun my-window-delete-popup-frame (&rest_)
+    "kill selected frame if it has the parameter `my-window-popup-frame'
+              This function is used via a hook."
+    (when (frame-parameter nil 'my-window-popup-frame) ;; nil means the frame is the current frame
+      (delete-frame)))
+
+
+
+  (defmacro my-window-define-with-popup-frame (command)
+    "Define interactive function which calls COMMAND in a new frame.
+  Make the new frame have the `my-window-popup-frame' parameter."
+    `(defun ,(intern (format "my-window-popup-%s" command)) ()
+       ,(format "Run `%s' in a popup frame with `my-window-popup-frame' parameter.
+  Also see `my-window-delete-popup-frame'." command)
+       (interactive)
+       (let ((frame (make-frame '((my-window-popup-frame . t)))))
+         (select-frame frame)
+         (switch-to-buffer " my-window-hidden-buffer-for-popup-frame")
+         (condition-case nil
+             (progn
+               (call-interactively ',command)
+               (modify-frame-parameters frame '((name . "emacs_popup_window"))))
+           ((quit error user-error)
+            (delete-frame frame))))))
+
+  (declare-function org-capture "org-capture" (&optional goto keys))
+  (defvar org-capture-after-finalize-hook)
+  (my-window-define-with-popup-frame org-capture)
+  (add-hook 'org-capture-after-finalize-hook #'my-window-delete-popup-frame)
+
+  (declare-function denote-inbox "my-denote-inbox" (&optional goto keys))
+  (defvar denote-inbox-after-finalize-hook)
+  (my-window-define-with-popup-frame my-denote-inbox)
+  ;; (add-hook 'after-save-hook #'my-window-delete-popup-frame)
 
 #+end_src
 
