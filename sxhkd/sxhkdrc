@@ -9,13 +9,13 @@ super + shift + f
 # emacs
 # interactive mode is necessary in order to obtain the environmental variables of the bashrc
 super + e
-      bash -ci 'emacsclient -c -a "emacs"' 
+      bspc rule -a 'Emacs' state=tiling && bash -ci 'emacsclient -c -a "emacs"' 
 
 super + c
-      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-org-capture)'
+      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-my-denote-tech-journal-new-or-existing-entry)'
 
 super + i
-      bspc rule -a Emacs state=floating && emacsclient -e "(my-window-popup-my-denote-inbox)"
+      bspc rule -a Emacs state=floating && emacsclient -e '(my-window-popup-denote-journal-extras-new-or-existing-entry)'
       
 # terminal
 super + Return
