@@ -392,6 +392,71 @@ prettifies org-mode
     (completion-styles '(orderless basic))
     (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
+* giles-fig
+#+begin_src emacs-lisp
+
+    (defvar test1
+      "\\begin{figure}[ht]
+    \\centering
+    \\incfig{%s}
+    \\caption{%s}
+    \\label{fig:%s}
+    \\end{figure}")
+
+    (defvar inkscape_export_to_pdf
+      "inkscape --export-area-drawing --export-dpi 300 --export-type=pdf --export-latex --export-filename %s %s")
+
+    (defvar fig-directory "figures")
+
+    (defun gilesfig-dashes (s)
+      "Replaces whitespaces in string `s' with dashes"
+      (replace-regexp-in-string "[ \f\t\n\r\v-]+" "-" (string-trim s)))
+
+    (defun gilesfig-format (s)
+      "Formats the argument code snippet by applying the `gilesfig-dashes' function"
+      (format test1 (gilesfig-dashes s) s (gilesfig-dashes s)))
+
+    (defun gilesfig-insert-formatted-snippet (original)
+      "Inserts snippet"
+        (let ((replaced (gilesfig-format original)))
+          (insert replaced)))
+
+    (defun gilesfig-create-svg-and-open-inkscape (filepath)
+      (shell-command-to-string  (format "inkscape --actions='file-new;export-filename:%s;export-do'" filepath))
+      (start-process "inkscape" nil "inkscape" filepath))
+
+    (defun gilesfig ()
+      (interactive)
+      (when (and (use-region-p) (f-directory-p fig-directory))
+        (let* ((start (region-beginning))
+    	   (end (region-end))
+    	   (filename (gilesfig-dashes (string-trim (buffer-substring-no-properties start end))))
+    	   (filepath (concat (format "./%s/%s.svg" fig-directory filename))))
+          (if (not (file-exists-p filepath))
+    	  (progn (write-region "" nil filepath)
+    		 (delete-region start end)
+    		 (gilesfig-insert-formatted-snippet filename)
+    		 (gilesfig-create-svg-and-open-inkscape filepath)
+    		 (gilesfig-watcher-add filename)
+    		 )
+    	(message (format "File %s already exists in %s directory" filename fig-directory))))))
+
+    (defun gilesfig-watcher-add (filename)
+      (inotify-add-watch (concat default-directory fig-directory "/" filename ".svg")
+    		     'modify
+    		     (gilesfig-watcher-callback filename)))
+
+    (defun gilesfig-watcher-callback (filename)
+      "Return a function to re-export FILENAME.svg when it changes."
+      `(lambda (event)
+        (shell-command
+         (let ((filepath (concat "./" fig-directory "/" ,filename)))
+  	 (format inkscape_export_to_pdf (concat filepath ".pdf") (concat filepath ".svg"))))))
+         
+        
+
+    (keymap-global-set "C-c y" 'gilesfig)   
+#+end_src
 * Denote
 :PROPERTIES:
 :ID:       60189a31-2193-4906-ad87-c8e074810aca
@@ -580,6 +645,7 @@ called?
       				       "%%% TeX-master: \"master\""
       				       "\n"
       				       "%%% End:"))
+  	      (tech-journal . "\n\n\n* Journal\n\n* Anki")
     	      ))
 
 
@@ -611,7 +677,7 @@ called?
       (interactive)
       (let ((denote-journal-keyword "techjournal")
             (denote-journal-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-            (denote-org-front-matter (concat (string-trim-right denote-org-front-matter "\n") "#+ANKI_DECK: org-anki-journal\n\n* Anki Headers\n\n* Journal")))
+            )
         (call-interactively 'denote-journal-new-or-existing-entry)))
 
     (defun my-denote-math-journal-new-or-existing-entry()
@@ -927,7 +993,13 @@ change the theme based on the sunset and sunrise times.
     :defer t
     :config
     (setq elfeed-feeds '("https://protesilaos.com/master.xml"
-  		       "https://karthinks.com/index.xml")))
+  		       "https://karthinks.com/index.xml"
+  		       "http://xahlee.info/js/blog.xml"
+  		       "http://wordy/lit/blog.xml"
+  		       "http://xahlee.info/math/blog.xml"
+  		       "http://xahlee.info/comp/blog.xml"
+  		       "http://xahlee.info/js/blog.xml"
+  		       "http://xahlee.info/js/blog.xml")))
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
