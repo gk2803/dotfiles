@@ -1351,12 +1351,6 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
   (global-set-key (kbd "<f9>")
   		(lambda () (interactive) (shell-command "~/scripts/yt-start-pause.sh")))
 
-  (global-set-key (kbd "<f10>")
-  		(lambda () (interactive) (shell-command "~/scripts/yt-moveb-5-secs.sh")))
-
-  (global-set-key (kbd "<f11>")
-  		(lambda () (interactive) (shell-command "~/scripts/yt-movef-5-secs.sh")))
-
 #+end_src
 
 * move text
