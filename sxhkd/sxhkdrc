@@ -11,11 +11,8 @@ super + shift + f
 super + e
       bspc rule -a 'Emacs' state=tiling && bash -ci 'emacsclient -c -a "emacs"' 
 
-super + c
-      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-my-denote-tech-journal-new-or-existing-entry)'
-
 super + i
-      bspc rule -a Emacs state=floating && emacsclient -e '(my-window-popup-denote-journal-new-or-existing-entry)'
+      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-my-latex-scratch-buffer)'
       
 # terminal
 super + Return

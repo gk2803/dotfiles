@@ -479,121 +479,113 @@ called?
             (setq denote-directory '"~/Nextcloud/Documents/publicNotes")
             :bind
             (:map global-map
-                  ("C-c n r" . my-denote-reference)
-                  ("C-c n i" . my-denote-inbox)
                   ("C-c n n" . my-denote-zk)
                   )	  
             :config
             ;; set the order of denote naming scheme
             (setq denote-file-name-components-order '(identifier signature title keywords ))
-            (setq denote-commands-for-new-notes '(denote my-denote-zk my-denote-reference))
+  	  (setq denote-infer-keywords nil)
+  	  (setq denote-known-keywords '(list "emacs" "math"))
+
 
             ;; Variant of `my-denote-region' to reference the source
-            (defun my-denote-region-get-source-reference ()
-              "Get a reference to the source for use with `my-denote-region'.
-                                                                       The reference is a URL or an Org-formatted link to a file."
-              ;; We use a `cond' here because we can extend it to cover more
-              ;; cases.
-              (cond
-               ((derived-mode-p 'eww-mode)
-                (plist-get eww-data :url))
-               ;; Here we are just assuming an Org format.  We can make this more
-               ;; involved, if needed.
-               (buffer-file-name
-                (format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
+            ;; (defun my-denote-region-get-source-reference ()
+            ;;   "Get a reference to the source for use with `my-denote-region'.
+            ;;                                                            The reference is a URL or an Org-formatted link to a file."
+            ;;   ;; We use a `cond' here because we can extend it to cover more
+            ;;   ;; cases.
+            ;;   (cond
+            ;;    ((derived-mode-p 'eww-mode)
+            ;;     (plist-get eww-data :url))
+            ;;    ;; Here we are just assuming an Org format.  We can make this more
+            ;;    ;; involved, if needed.
+            ;;    (buffer-file-name
+            ;;     (format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
 
-            (defun my-denote-region (&optional lst)
-              "Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
-                                                                  			    If LST is not provided, use the default list '(title signature)."
-              (declare (interactive-only t))
-              (interactive)
-              (let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
-                (if-let (((region-active-p)) 
-                         ;; Capture the text early, otherwise it will be empty
-                         ;; the moment `insert` is called.
-                         (text (buffer-substring-no-properties (region-beginning) (region-end))))
-                    (progn
-                      (let ((denote-ignore-region-in-denote-command t))
-                        (call-interactively #'denote))
-                      (push-mark (point))
-                      (insert text)
-                      (run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
-                  ;; If no region is active, just call `denote` with the prompt list.
-                  (call-interactively #'denote))))
+            ;; (defun my-denote-region (&optional lst)
+            ;;   "Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
+            ;;                                                       			    If LST is not provided, use the default list '(title signature)."
+            ;;   (declare (interactive-only t))
+            ;;   (interactive)
+            ;;   (let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
+            ;;     (if-let (((region-active-p)) 
+            ;;              ;; Capture the text early, otherwise it will be empty
+            ;;              ;; the moment `insert` is called.
+            ;;              (text (buffer-substring-no-properties (region-beginning) (region-end))))
+            ;;         (progn
+            ;;           (let ((denote-ignore-region-in-denote-command t))
+            ;;             (call-interactively #'denote))
+            ;;           (push-mark (point))
+            ;;           (insert text)
+            ;;           (run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
+            ;;       ;; If no region is active, just call `denote` with the prompt list.
+            ;;       (call-interactively #'denote))))
 
-            (defun my-denote-region-with-reference-zk ()
-              "Like `denote-region', but add the context afterwards.
-                                                                  				For how the context is retrieved, see `my-denote-region-get-source-reference'."
-              (interactive)
-              (let ((context (my-denote-region-get-source-reference))
-                    (denote-directory "~/Nextcloud/Documents/publicNotes/")
-                    (denote-file-name-components-order '(signature title keywords identifier)))
-                (my-denote-region '(signature title keywords))
-                (when context
-                  (goto-char (point-max))
-                  (insert "\n")
-                  (insert context))))
+            ;; (defun my-denote-region-with-reference-zk ()
+            ;;   "Like `denote-region', but add the context afterwards.
+            ;;                                                       				For how the context is retrieved, see `my-denote-region-get-source-reference'."
+            ;;   (interactive)
+            ;;   (let ((context (my-denote-region-get-source-reference))
+            ;;         (denote-directory "~/Nextcloud/Documents/publicNotes/")
+            ;;         (denote-file-name-components-order '(signature title keywords identifier)))
+            ;;     (my-denote-region '(signature title keywords))
+            ;;     (when context
+            ;;       (goto-char (point-max))
+            ;;       (insert "\n")
+            ;;       (insert context))))
 
             (defun my-denote-zk ()
               "Like `denote', but with the prompts order of `my-denote-zk'"
               (declare (interactive-only t))
               (interactive)
               (let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
-                    (denote-file-name-components-order '(signature title keywords identifier))
-                    (denote-prompts '(signature title keywords)))
+                    (denote-file-name-components-order '(title keywords identifier))
+                    (denote-prompts '(title keywords)))
                 (call-interactively 'denote)))
 
-            (defun my-denote-region-with-reference-reference ()
-              "Like `my-denote-region-with-reference-zk' but saved as a `reference'
-                                                                       and has no signature"
-              (interactive)
-              (let ((context (my-denote-region-get-source-reference))
-                    (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
-                (my-denote-region '(title keywords))
-                (when context
-                  (goto-char (point-max))
-                  (insert "\n")
-                  (insert context))))
+            ;; (defun my-denote-region-with-reference-reference ()
+            ;;   "Like `my-denote-region-with-reference-zk' but saved as a `reference'
+            ;;                                                            and has no signature"
+            ;;   (interactive)
+            ;;   (let ((context (my-denote-region-get-source-reference))
+            ;;         (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
+            ;;     (my-denote-region '(title keywords))
+            ;;     (when context
+            ;;       (goto-char (point-max))
+            ;;       (insert "\n")
+            ;;       (insert context))))
 
-            (defun my-denote-inbox ()
-              "Create a simple post note, something you might want to remember,
-                                                                       everything goes"
-              (declare (interactive-only t))
-              (interactive)
-              (let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
-                    (denote-infer-keywords nil)
-                    (denote-prompts '())
-                    (denote-org-front-matter
-                     "#+date:       %2$s \n#+identifier: %4$s
-                                                                   \n"))
-                (call-interactively 'denote)))
+            ;; (defun my-denote-inbox ()
+            ;;   "Create a simple post note, something you might want to remember,
+            ;;                                                            everything goes"
+            ;;   (declare (interactive-only t))
+            ;;   (interactive)
+            ;;   (let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
+            ;;         (denote-infer-keywords nil)
+            ;;         (denote-prompts '())
+            ;;         (denote-org-front-matter
+            ;;          "#+date:       %2$s \n#+identifier: %4$s
+            ;;                                                        \n"))
+            ;;     (call-interactively 'denote)))
 
-            (defun my-denote-reference ()
-              "Create a reference note"
-              (declare (interactive-only t))
-              (interactive)
-              (let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
-                    (denote-infer-keywords nil)
-                    (denote-known-keywords '("reference" "book"))
-                    (denote-prompts '(title keywords))
-                    )
-                (call-interactively 'denote)))
+            ;; (defun my-denote-reference ()
+            ;;   "Create a reference note"
+            ;;   (declare (interactive-only t))
+            ;;   (interactive)
+            ;;   (let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
+            ;;         (denote-infer-keywords nil)
+            ;;         (denote-known-keywords '("reference" "book"))
+            ;;         (denote-prompts '(title keywords))
+            ;;         )
+            ;;     (call-interactively 'denote)))
 
-            (defun my-denote-zk ()
-              "Create the main zettelkasten note"
-              (declare (interactive-only t))
-              (interactive)
-              (let ((denote-directory "~/Nextcloud/Documents/publicNotes/")
-                    (denote-prompts '(signature title keywords))
-                    (denote-file-name-components-order '(signature title keywords identifier)))
-                (call-interactively 'denote)))
 
-            (defun my-denote-rename-file-signature ()
-              "rename file using the naming convention I use on my zk notes"
-              (declare (interactive-only t))
-              (interactive)
-              (let ((denote-file-name-components-order '(signature title keywords identifier)))
-                (call-interactively 'denote-rename-file-signature)))
+            ;; (defun my-denote-rename-file-signature ()
+            ;;   "rename file using the naming convention I use on my zk notes"
+            ;;   (declare (interactive-only t))
+            ;;   (interactive)
+            ;;   (let ((denote-file-name-components-order '(signature title keywords identifier)))
+            ;;     (call-interactively 'denote-rename-file-signature)))
             
             ;; see https://protesilaos.com/codelog/2022-10-30-demo-denote-custom-file-type/
             (setq denote-file-types
@@ -649,15 +641,22 @@ called?
     	      ))
 
 
-            (defun my-denote-curated ()
-              "Create a curated Note, a well established thought, an article"
-              (declare (interactive-only t))
-              (interactive)
-              (let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
-                    (denote-infer-keywords nil)
-                    (denote-known-keywords '("curated"))
-                    (denote-prompts '(title keywords)))
-                (call-interactively 'denote))))
+            ;; (defun my-denote-curated ()
+            ;;   "Create a curated Note, a well established thought, an article"
+            ;;   (declare (interactive-only t))
+            ;;   (interactive)
+            ;;   (let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
+            ;;         (denote-infer-keywords nil)
+            ;;         (denote-known-keywords '("curated"))
+            ;;         (denote-prompts '(title keywords)))
+            ;;     (call-interactively 'denote)))
+  	  )
+
+
+
+
+
+
 #+end_src
 
 ** denote journal
@@ -668,17 +667,16 @@ called?
     :bind
     (:map global-map
           ("C-c n j" . denote-journal-new-or-existing-entry)
-          ("C-c n t" . my-denote-tech-journal-new-or-existing-entry)
     	("C-c n l" . my-denote-math-journal-new-or-existing-entry))
     :hook (calendar-mode . denote-journal-calendar-mode)
     :config
-    (defun my-denote-tech-journal-new-or-existing-entry()
-      "Like `denote-journal-new-or-existing-entry' using the corresponding tech journal directory instead"
-      (interactive)
-      (let ((denote-journal-keyword "techjournal")
-            (denote-journal-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-            )
-        (call-interactively 'denote-journal-new-or-existing-entry)))
+    ;; (defun my-denote-tech-journal-new-or-existing-entry()
+    ;;   "Like `denote-journal-new-or-existing-entry' using the corresponding tech journal directory instead"
+    ;;   (interactive)
+    ;;   (let ((denote-journal-keyword "techjournal")
+    ;;         (denote-journal-directory "~/Nextcloud/Documents/publicNotes/tech journal")
+    ;;         )
+    ;;     (call-interactively 'denote-journal-new-or-existing-entry)))
 
     (defun my-denote-math-journal-new-or-existing-entry()
       "Like `denote-journal-new-or-existing-entry' using the corresponding tech journal directory instead"
@@ -698,7 +696,6 @@ called?
                 (insert (concat "\n\\input{" buf "}\n"))))
             )))))
 #+end_src
-
 * Dired
 ** basic config
 Taken from protesilaos.com
@@ -999,7 +996,7 @@ change the theme based on the sunset and sunrise times.
   		       "http://xahlee.info/math/blog.xml"
   		       "http://xahlee.info/comp/blog.xml"
   		       "http://xahlee.info/js/blog.xml"
-  		       "http://xahlee.info/js/blog.xml")))
+  		       "https://news.ycombinator.com/rss")))
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
@@ -1380,82 +1377,99 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
 #+end_src
 
 * Window
+:PROPERTIES:
+:ID:       87db6df2-42b8-4b70-9bc8-0dd8bef7c3f8
+:END:
 #+begin_src emacs-lisp
-  (setq display-buffer-alist
-        '(
-          ;; ;; matcher can be a regexp that matches the buffers name as shown bellow
-          ;; ("\\*Python\\*"
-          ;;  ;; list of display functions
-          ;;  (display-buffer-reuse-mode-window display-buffer-below-selected)
-          ;;  ;; (PARAMETER . VALUE)
-          ;;  (window-height . fit-to-window) ;;fit buffer to the size of the window
-          ;;  (dedicated . t)
-          ;;  )
+    (setq display-buffer-alist
+          '(
+            ;; ;; matcher can be a regexp that matches the buffers name as shown bellow
+            ;; ("\\*Python\\*"
+            ;;  ;; list of display functions
+            ;;  (display-buffer-reuse-mode-window display-buffer-below-selected)
+            ;;  ;; (PARAMETER . VALUE)
+            ;;  (window-height . fit-to-window) ;;fit buffer to the size of the window
+            ;;  (dedicated . t)
+            ;;  )
 
-          ;; matcher can also be a major mode
-          ((or . (( derived-mode . compilation-mode)
-                  (derived-mode . inferior-python-mode))) 
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           ;; (PARAMETER . VALUE)
-           (window-height . fit-to-window) ;;fit buffer to the size of the window
-           (dedicated . t))
-          ))
+            ;; matcher can also be a major mode
+            ((or . (( derived-mode . compilation-mode)
+                    (derived-mode . inferior-python-mode))) 
+             (display-buffer-reuse-mode-window display-buffer-below-selected)
+             ;; (PARAMETER . VALUE)
+             (window-height . fit-to-window) ;;fit buffer to the size of the window
+             (dedicated . t))
+            ))
 
-  ;; windows keys
-  ;; Keybindings for window management
-  (define-key global-map (kbd "C-x C-n") 'next-buffer)
-  (define-key global-map (kbd "C-x C-p") 'previous-buffer)
-  (define-key global-map (kbd "C-x !") 'delete-other-windows-vertically)
-  (define-key global-map (kbd "C-x _") 'balance-windows)
-  (define-key global-map (kbd "C-x }") 'enlarge-window)
-  (define-key global-map (kbd "C-x {") 'shrink-window)
-  (define-key global-map (kbd "C-x >") 'enlarge-window-horizontally)
-  (define-key global-map (kbd "C-x <") 'shrink-window-horizontally)
-  (define-key global-map (kbd "C-x -") 'fit-window-to-buffer)
+    ;; windows keys
+    ;; Keybindings for window management
+    (define-key global-map (kbd "C-x C-n") 'next-buffer)
+    (define-key global-map (kbd "C-x C-p") 'previous-buffer)
+    (define-key global-map (kbd "C-x !") 'delete-other-windows-vertically)
+    (define-key global-map (kbd "C-x _") 'balance-windows)
+    (define-key global-map (kbd "C-x }") 'enlarge-window)
+    (define-key global-map (kbd "C-x {") 'shrink-window)
+    (define-key global-map (kbd "C-x >") 'enlarge-window-horizontally)
+    (define-key global-map (kbd "C-x <") 'shrink-window-horizontally)
+    (define-key global-map (kbd "C-x -") 'fit-window-to-buffer)
 
-  ;; Keybindings for resizing windows
-  (define-key resize-window-repeat-map (kbd ">") 'enlarge-window-horizontally)
-  (define-key resize-window-repeat-map (kbd "<") 'shrink-window-horizontally)
+    ;; Keybindings for resizing windows
+    (define-key resize-window-repeat-map (kbd ">") 'enlarge-window-horizontally)
+    (define-key resize-window-repeat-map (kbd "<") 'shrink-window-horizontally)
 
-  ;; repeat mode
-  (repeat-mode 1)
-  (blink-cursor-mode -1)
+    ;; repeat mode
+    (repeat-mode 1)
+    (blink-cursor-mode -1)
 
-  ;; works for opening link in the same buffer with org-open-at-point
-  (setq org-link-frame-setup '((file . find-file)))
+    ;; works for opening link in the same buffer with org-open-at-point
+    (setq org-link-frame-setup '((file . find-file)))
 
-  ;; calling emacs frame outside emacs
-  (defun my-window-delete-popup-frame (&rest_)
-    "kill selected frame if it has the parameter `my-window-popup-frame'
-              This function is used via a hook."
-    (when (frame-parameter nil 'my-window-popup-frame) ;; nil means the frame is the current frame
-      (delete-frame)))
+    ;; calling emacs frame outside emacs
+    (defun my-window-delete-popup-frame (&rest_)
+      "kill selected frame if it has the parameter `my-window-popup-frame'
+                This function is used via a hook."
+      (when (frame-parameter nil 'my-window-popup-frame) ;; nil means the frame is the current frame
+        (delete-frame)))
 
 
 
-  (defmacro my-window-define-with-popup-frame (command)
-    "Define interactive function which calls COMMAND in a new frame.
-  Make the new frame have the `my-window-popup-frame' parameter."
-    `(defun ,(intern (format "my-window-popup-%s" command)) ()
-       ,(format "Run `%s' in a popup frame with `my-window-popup-frame' parameter.
-  Also see `my-window-delete-popup-frame'." command)
-       (interactive)
-       (let ((frame (make-frame '((my-window-popup-frame . t)))))
-         (select-frame frame)
-         (switch-to-buffer " my-window-hidden-buffer-for-popup-frame")
-         (condition-case nil
-             (progn
-               (call-interactively ',command)
-               (modify-frame-parameters frame '((name . "emacs_popup_window"))))
-           ((quit error user-error)
-            (delete-frame frame))))))
+    (defmacro my-window-define-with-popup-frame (command)
+      "Define interactive function which calls COMMAND in a new frame.
+    Make the new frame have the `my-window-popup-frame' parameter."
+      `(defun ,(intern (format "my-window-popup-%s" command)) ()
+         ,(format "Run `%s' in a popup frame with `my-window-popup-frame' parameter.
+    Also see `my-window-delete-popup-frame'." command)
+         (interactive)
+         (let ((frame (make-frame '((my-window-popup-frame . t)))))
+           (select-frame frame)
+           (switch-to-buffer " my-window-hidden-buffer-for-popup-frame")
+           (condition-case nil
+               (progn
+                 (call-interactively ',command)
+                 (modify-frame-parameters frame '((name . "emacs_popup_window"))))
+             ((quit error user-error)
+              (delete-frame frame))))))
 
-  (declare-function denote-journal "my-denote-journal" (&optional goto keys))
-  (my-window-define-with-popup-frame denote-journal-new-or-existing-entry)
+    (defun my-latex-scratch-buffer()
+      (interactive)
+      (scratch-buffer)
+      (delete-region (point-min) (point-max))
+      (LaTeX-mode))
 
-  (declare-function denote-tech-journal "my-denote-tech-journal" (&optional goto keys))
-  (my-window-define-with-popup-frame my-denote-tech-journal-new-or-existing-entry)
+    (declare-function my-latex-scratch-buffer "my-latex-scratch-buffer" (&optional goto keys))
+    (my-window-define-with-popup-frame my-latex-scratch-buffer)
 
+    ;;control firefox youtube-player from emacs
+  (global-set-key (kbd "<f9>")
+  		(lambda () (interactive) (shell-command "~/scripts/yt-start-pause.sh")))
+  (global-set-key (kbd "<f10>")
+  		(lambda () (interactive) (shell-command "~/scripts/yt-move-5-secs.sh")))
+
+  (global-set-key (kbd "<f11>")
+  		(lambda () (interactive) (shell-command "~/scripts/yt-movef-5-secs.sh")))
+
+  (global-set-key (kbd "<f12>")
+  		(lambda () (interactive) (shell-command "~/scripts/yt-moveb-5-secs.sh")))
 
 #+end_src
 
