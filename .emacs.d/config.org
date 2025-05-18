@@ -485,7 +485,11 @@ called?
             ;; set the order of denote naming scheme
             (setq denote-file-name-components-order '(identifier signature title keywords ))
   	  (setq denote-infer-keywords nil)
+<<<<<<< HEAD
   	  (setq denote-known-keywords '(list "emacs" "math"))
+=======
+  	  (setq denote-known-keywords '("thoughts" "emacs" "math" "tech"))
+>>>>>>> 2cb122c (control youtube player from emacs)
 
 
             ;; Variant of `my-denote-region' to reference the source
@@ -898,6 +902,7 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
       "supp" "\\supp"
       "On" "O(n)"
       "O1" "O(1)"
+      "=?" "\\stackrel{?}{=}"
       ":=" "\\coloneqq"
       "Olog" "O(\\log n)"
       "Olon" "O(n \\log n)"
@@ -1462,6 +1467,7 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     ;;control firefox youtube-player from emacs
   (global-set-key (kbd "<f9>")
   		(lambda () (interactive) (shell-command "~/scripts/yt-start-pause.sh")))
+<<<<<<< HEAD
   (global-set-key (kbd "<f10>")
   		(lambda () (interactive) (shell-command "~/scripts/yt-move-5-secs.sh")))
 
@@ -1470,6 +1476,14 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
 
   (global-set-key (kbd "<f12>")
   		(lambda () (interactive) (shell-command "~/scripts/yt-moveb-5-secs.sh")))
+=======
+
+  (global-set-key (kbd "<f10>")
+  		(lambda () (interactive) (shell-command "~/scripts/yt-moveb-5-secs.sh")))
+
+  (global-set-key (kbd "<f11>")
+  		(lambda () (interactive) (shell-command "~/scripts/yt-movef-5-secs.sh")))
+>>>>>>> 2cb122c (control youtube player from emacs)
 
 #+end_src
 
