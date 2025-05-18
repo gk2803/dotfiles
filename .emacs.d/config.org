@@ -92,7 +92,7 @@ requires =cmake= and =libvterm-dev=
     
     ;; org anki
     (setq org-anki-default-note-type "Basic (and reversed card)")
-    
+    (setq org-export-with-broken-links t)    
     (defun toggle-org-hide-emphasis-markers ()
       "Toggle value of org=hide-emphasis-markers`"
       (interactive)
@@ -485,59 +485,11 @@ called?
             ;; set the order of denote naming scheme
             (setq denote-file-name-components-order '(identifier signature title keywords ))
   	  (setq denote-infer-keywords nil)
-<<<<<<< HEAD
-  	  (setq denote-known-keywords '(list "emacs" "math"))
-=======
   	  (setq denote-known-keywords '("thoughts" "emacs" "math" "tech"))
->>>>>>> 2cb122c (control youtube player from emacs)
-
-
-            ;; Variant of `my-denote-region' to reference the source
-            ;; (defun my-denote-region-get-source-reference ()
-            ;;   "Get a reference to the source for use with `my-denote-region'.
-            ;;                                                            The reference is a URL or an Org-formatted link to a file."
-            ;;   ;; We use a `cond' here because we can extend it to cover more
-            ;;   ;; cases.
-            ;;   (cond
-            ;;    ((derived-mode-p 'eww-mode)
-            ;;     (plist-get eww-data :url))
-            ;;    ;; Here we are just assuming an Org format.  We can make this more
-            ;;    ;; involved, if needed.
-            ;;    (buffer-file-name
-            ;;     (format "[[file:%s][%s]]" buffer-file-name (buffer-name)))))
-
-            ;; (defun my-denote-region (&optional lst)
-            ;;   "Call `denote-subdirectory-signature-title-keywords' and insert therein the text of the active region.
-            ;;                                                       			    If LST is not provided, use the default list '(title signature)."
-            ;;   (declare (interactive-only t))
-            ;;   (interactive)
-            ;;   (let ((denote-prompts (or lst '(subdirectory signature title keywords))))  ;; Use LST or default '(title signature)
-            ;;     (if-let (((region-active-p)) 
-            ;;              ;; Capture the text early, otherwise it will be empty
-            ;;              ;; the moment `insert` is called.
-            ;;              (text (buffer-substring-no-properties (region-beginning) (region-end))))
-            ;;         (progn
-            ;;           (let ((denote-ignore-region-in-denote-command t))
-            ;;             (call-interactively #'denote))
-            ;;           (push-mark (point))
-            ;;           (insert text)
-            ;;           (run-hook-with-args 'denote-region-after-new-note-functions (mark) (point)))
-            ;;       ;; If no region is active, just call `denote` with the prompt list.
-            ;;       (call-interactively #'denote))))
-
-            ;; (defun my-denote-region-with-reference-zk ()
-            ;;   "Like `denote-region', but add the context afterwards.
-            ;;                                                       				For how the context is retrieved, see `my-denote-region-get-source-reference'."
-            ;;   (interactive)
-            ;;   (let ((context (my-denote-region-get-source-reference))
-            ;;         (denote-directory "~/Nextcloud/Documents/publicNotes/")
-            ;;         (denote-file-name-components-order '(signature title keywords identifier)))
-            ;;     (my-denote-region '(signature title keywords))
-            ;;     (when context
-            ;;       (goto-char (point-max))
-            ;;       (insert "\n")
-            ;;       (insert context))))
-
+  	  (setq denote-templates
+      	    `(("math-journal" . ,(my-denote-math-journal-template))
+    	      ))
+  	  
             (defun my-denote-zk ()
               "Like `denote', but with the prompts order of `my-denote-zk'"
               (declare (interactive-only t))
@@ -546,51 +498,6 @@ called?
                     (denote-file-name-components-order '(title keywords identifier))
                     (denote-prompts '(title keywords)))
                 (call-interactively 'denote)))
-
-            ;; (defun my-denote-region-with-reference-reference ()
-            ;;   "Like `my-denote-region-with-reference-zk' but saved as a `reference'
-            ;;                                                            and has no signature"
-            ;;   (interactive)
-            ;;   (let ((context (my-denote-region-get-source-reference))
-            ;;         (denote-directory "~/Nextcloud/Documents/publicNotes/references"))
-            ;;     (my-denote-region '(title keywords))
-            ;;     (when context
-            ;;       (goto-char (point-max))
-            ;;       (insert "\n")
-            ;;       (insert context))))
-
-            ;; (defun my-denote-inbox ()
-            ;;   "Create a simple post note, something you might want to remember,
-            ;;                                                            everything goes"
-            ;;   (declare (interactive-only t))
-            ;;   (interactive)
-            ;;   (let ((denote-directory "~/Nextcloud/Documents/publicNotes/inbox")
-            ;;         (denote-infer-keywords nil)
-            ;;         (denote-prompts '())
-            ;;         (denote-org-front-matter
-            ;;          "#+date:       %2$s \n#+identifier: %4$s
-            ;;                                                        \n"))
-            ;;     (call-interactively 'denote)))
-
-            ;; (defun my-denote-reference ()
-            ;;   "Create a reference note"
-            ;;   (declare (interactive-only t))
-            ;;   (interactive)
-            ;;   (let ((denote-directory "~/Nextcloud/Documents/publicNotes/references/")
-            ;;         (denote-infer-keywords nil)
-            ;;         (denote-known-keywords '("reference" "book"))
-            ;;         (denote-prompts '(title keywords))
-            ;;         )
-            ;;     (call-interactively 'denote)))
-
-
-            ;; (defun my-denote-rename-file-signature ()
-            ;;   "rename file using the naming convention I use on my zk notes"
-            ;;   (declare (interactive-only t))
-            ;;   (interactive)
-            ;;   (let ((denote-file-name-components-order '(signature title keywords identifier)))
-            ;;     (call-interactively 'denote-rename-file-signature)))
-            
             ;; see https://protesilaos.com/codelog/2022-10-30-demo-denote-custom-file-type/
             (setq denote-file-types
                   (append denote-file-types
@@ -622,17 +529,9 @@ called?
   tags:       %s
   identifier: %s
   \\fi\n\n")
-        
 
-
-            (defun my-denote-template-function-for-latex-journal ()
-      	 (format-time-string "\\section{%Y %d %B}")
-      	 )
-
-
-
-            (setq denote-templates
-      	    `((math-journal . ,(concat (my-denote-template-function-for-latex-journal)
+  	  (defun my-denote-math-journal-template ()
+  	    (concat (format-time-string "\\section{%Y %d %B}")
       				       "\n\n\n\n"
       				       "%%% Local Variables:"
       				       "\n"
@@ -640,29 +539,8 @@ called?
       				       "\n"
       				       "%%% TeX-master: \"master\""
       				       "\n"
-      				       "%%% End:"))
-  	      (tech-journal . "\n\n\n* Journal\n\n* Anki")
-    	      ))
-
-
-            ;; (defun my-denote-curated ()
-            ;;   "Create a curated Note, a well established thought, an article"
-            ;;   (declare (interactive-only t))
-            ;;   (interactive)
-            ;;   (let ((denote-directory "~/Nextcloud/Documents/publicNotes/curated")
-            ;;         (denote-infer-keywords nil)
-            ;;         (denote-known-keywords '("curated"))
-            ;;         (denote-prompts '(title keywords)))
-            ;;     (call-interactively 'denote)))
-  	  )
-
-
-
-
-
-
+      				       "%%% End:")))
 #+end_src
-
 ** denote journal
 #+begin_src emacs-lisp
   (use-package denote-journal
@@ -670,25 +548,25 @@ called?
     ;; Bind those to some key for your convenience.
     :bind
     (:map global-map
-          ("C-c n j" . denote-journal-new-or-existing-entry)
+          ("C-c n j" . my-denote-journal-new-or-existing-entry)
     	("C-c n l" . my-denote-math-journal-new-or-existing-entry))
     :hook (calendar-mode . denote-journal-calendar-mode)
     :config
-    ;; (defun my-denote-tech-journal-new-or-existing-entry()
-    ;;   "Like `denote-journal-new-or-existing-entry' using the corresponding tech journal directory instead"
-    ;;   (interactive)
-    ;;   (let ((denote-journal-keyword "techjournal")
-    ;;         (denote-journal-directory "~/Nextcloud/Documents/publicNotes/tech journal")
-    ;;         )
-    ;;     (call-interactively 'denote-journal-new-or-existing-entry)))
-
+    (defvar my-denote-math-journal-directory "~/Nextcloud/Documents/publicNotes/math journal")
+    (defun my-denote-journal-new-or-existing-entry()
+      "Like `denote-journal-new-or-existing-entry' but without prompting for a template"
+      (interactive)
+      (let ((denote-templates nil))
+        (call-interactively #'denote-journal-new-or-existing-entry)))
     (defun my-denote-math-journal-new-or-existing-entry()
       "Like `denote-journal-new-or-existing-entry' using the corresponding tech journal directory instead"
       (interactive)
       (let ((denote-journal-keyword "mathjournal")
-            (denote-journal-directory "~/Nextcloud/Documents/publicNotes/math journal")
+            (denote-journal-directory my-denote-math-journal-directory)
             (denote-file-type 'tex)
-  	  (denote-use-template 'math-journal))
+  	  (denote-templates nil)
+  	  (denote-use-template (cdr (assoc "math-journal" denote-templates)))
+  	  )
         (call-interactively #'denote-journal-new-or-existing-entry)
         (let ((buf (buffer-name)))
           (with-current-buffer (find-file-noselect "~/Nextcloud/Documents/publicNotes/math journal/master.tex")
@@ -936,7 +814,10 @@ https://github.com/tecosaur/LaTeX-auto-activating-snippets
     :ensure t
     :config 
     (setq yas-snippet-dirs '("~/Nextcloud/snippets/"))  
-    (yas-global-mode 1))
+    (yas-global-mode 1)
+    (add-hook 'yas-before-expand-snippet-hook (lambda () (smartparens-mode -1)))
+    (add-hook 'yas-after-exit-snippet-hook (lambda () (smartparens-mode 1)))
+    )
 #+end_src
 * Diary
 First I want to change the directory of the diary file in order to
@@ -995,13 +876,7 @@ change the theme based on the sunset and sunrise times.
     :defer t
     :config
     (setq elfeed-feeds '("https://protesilaos.com/master.xml"
-  		       "https://karthinks.com/index.xml"
-  		       "http://xahlee.info/js/blog.xml"
-  		       "http://wordy/lit/blog.xml"
-  		       "http://xahlee.info/math/blog.xml"
-  		       "http://xahlee.info/comp/blog.xml"
-  		       "http://xahlee.info/js/blog.xml"
-  		       "https://news.ycombinator.com/rss")))
+)))
 #+end_src
 * browse-url
 basic configuration for EWW(Emas Web Browser). EWW loads, parses and
@@ -1039,6 +914,15 @@ emacs with libxml2 support.
     (setq markdown-fontify-code-blocks-natively t))
 #+end_src
 * Development
+#+begin_src emacs-lisp
+  (use-package smartparens
+  :ensure t  ;; install the package
+  :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
+  :config
+  ;; load default config
+  (require 'smartparens-config)) 
+#+end_src
+
 ** Languages
 *** Language Server
 #+begin_src emacs-lisp
@@ -1380,7 +1264,6 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     (define-key global-map (kbd "<f6>") 'ispell-switch-dictionary)
     )
 #+end_src
-
 * Window
 :PROPERTIES:
 :ID:       87db6df2-42b8-4b70-9bc8-0dd8bef7c3f8
@@ -1467,23 +1350,12 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
     ;;control firefox youtube-player from emacs
   (global-set-key (kbd "<f9>")
   		(lambda () (interactive) (shell-command "~/scripts/yt-start-pause.sh")))
-<<<<<<< HEAD
-  (global-set-key (kbd "<f10>")
-  		(lambda () (interactive) (shell-command "~/scripts/yt-move-5-secs.sh")))
-
-  (global-set-key (kbd "<f11>")
-  		(lambda () (interactive) (shell-command "~/scripts/yt-movef-5-secs.sh")))
-
-  (global-set-key (kbd "<f12>")
-  		(lambda () (interactive) (shell-command "~/scripts/yt-moveb-5-secs.sh")))
-=======
 
   (global-set-key (kbd "<f10>")
   		(lambda () (interactive) (shell-command "~/scripts/yt-moveb-5-secs.sh")))
 
   (global-set-key (kbd "<f11>")
   		(lambda () (interactive) (shell-command "~/scripts/yt-movef-5-secs.sh")))
->>>>>>> 2cb122c (control youtube player from emacs)
 
 #+end_src
 

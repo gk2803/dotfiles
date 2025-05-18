@@ -7,6 +7,8 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)	     
 
+(add-to-list 'package-archives
+             '("gnu" . "https://elpa.gnu.org/packages") t)
 ;; makes it easy to install other packages 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -39,7 +41,7 @@
  '(org-agenda-files
    '("~/Nextcloud/Documents/publicNotes/references/20250211T201751--agores.org"))
  '(package-selected-packages
-   '(denote-journal org-agenda doom-themes ox-hugo python-pytest pyvenv direnv python-mode org-habit-stats gptel org-mode))
+   '(smartparens denote-journal org-agenda doom-themes ox-hugo python-pytest pyvenv direnv python-mode org-habit-stats gptel org-mode))
  '(package-vc-selected-packages '((org-mode :url "https://code.tecosaur.net/tec/org-mode"))))
 
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
