@@ -168,3 +168,9 @@ export PERL5LIB=/usr/local/texlive/2025/tlpkg
 # emacsclient as an editor
 export EDITOR="emacsclient -nw"
 export VISUAL=$EDITOR
+
+export NARGO_HOME="/home/rqd3/.nargo"
+
+export PATH="$PATH:$NARGO_HOME/bin"
+export PATH="${HOME}/.bb:${PATH}"
+
