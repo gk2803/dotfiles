@@ -1,22 +1,51 @@
-# toggle mode 
+######################################################################
+# F keys
+# toggle darkman 
 super + F5
       darkman toggle
       
-# launch firefox
-super + shift + f
-      firefox
-	
-# emacs
-# interactive mode is necessary in order to obtain the environmental variables of the bashrc
-super + e
-      bspc rule -a 'Emacs' state=tiling && bash -ci 'emacsclient -c -a "emacs"' 
+# focus/start emacs
+F1
+      ~/.config/scripts/emacs-focus.sh 
 
-super + i
-      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-my-latex-scratch-buffer)'
+# focus/start firefox
+F2
+      ~/.config/scripts/firefox-focus.sh
+
+# focus/start terminal
+F3
+      ~/.config/scripts/terminal-focus.sh
+
+# focus/start vscode
+F4
+      ~/.config/scripts/vscode-focus.sh
+
+# focus last node (alt tab equivalent)
+F5
+	bspc node -f last.local
+
+# cycle between nodes
+F6
+	bspc node -f prev.local.!hidden.window
+
+# toggle between fullscreen and floating
+F7
+    if bspc query -N -n focused.floating > /dev/null || bspc query -N -n focused.tiled > /dev/null; \ 
+        then bspc node -t fullscreen; \
+    elif bspc query -N -n focused.fullscreen > /dev/null; \
+        then bspc node -t floating; \
+    fi
+
+# kill ndoe
+F8
+	bspc node -c
+
+
+######################################################################
+#super + i
+#      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-my-latex-scratch-buffer)'
       
-# terminal
-super + Return
-      xfce4-terminal
+
 
 # rofi
 super + r
@@ -65,9 +94,11 @@ super + ctrl + {m,x,y,z}
 	bspc node -g {marked,locked,sticky,private}
 
 #
-# focus/swap
+# focus between nodes
 #
 
+
+	   
 # focus the node in the given direction
 super + {_,shift + }{h,j,k,l}
 	bspc node -{f,s} {west,south,north,east}
@@ -76,9 +107,7 @@ super + {_,shift + }{h,j,k,l}
 super + {p,b,comma,period}
 	bspc node -f @{parent,brother,first,second}
 
-# focus the next/previous window in the current desktop
-super + {_,shift + }n
-	bspc node -f {next,prev}.local.!hidden.window
+
 
 # focus the next/previous desktop in the current monitor
 super + bracket{left,right}
@@ -89,10 +118,10 @@ super + {grave,Tab}
 	bspc {node,desktop} -f last
 
 # focus the older or newer node in the focus history
-#super + {o,i}
-#	bspc wm -h off; \
-#	bspc node {older,newer} -f; \
-#	bspc wm -h on
+super + {o,i}
+	bspc wm -h off; \
+	bspc node {older,newer} -f; \
+	bspc wm -h on
 
 # focus or send to the given desktop
 super + {_,shift + }{1-9,0}
@@ -138,3 +167,12 @@ super + {Left,Down,Up,Right}
 # Rotating window trees
 super + shift + {d,a}
     bspc node @/ -C {forward,backward}
+
+
+######################################################################
+# numpad keys
+
+# focus firefox
+KP_Insert
+	~/.config/scripts/firefox-focus.sh
+
