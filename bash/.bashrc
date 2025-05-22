@@ -174,3 +174,6 @@ export NARGO_HOME="/home/rqd3/.nargo"
 export PATH="$PATH:$NARGO_HOME/bin"
 export PATH="${HOME}/.bb:${PATH}"
 
+# Use bash-completion, if available
+[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
+    . /usr/share/bash-completion/bash_completion
