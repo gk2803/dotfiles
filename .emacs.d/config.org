@@ -191,7 +191,7 @@ a gateway to our individual notes.
   	   :empty-lines-after 1)
   	  ("u" "Unprocessed" entry
   	   (file+headline "tasks.org" "Unprocessed")
-  	   ,(concat "* %^{Title}\n"
+  	   ,(concat "* TODO %^{Title}\n"
   		    ":PROPERTIES:\n"
   		    ":CAPTURED: %U\n"
   		    ":END:\n\n"
@@ -228,6 +228,9 @@ a gateway to our individual notes.
   	  )))
 #+end_src
 ** Agenda
+:PROPERTIES:
+:ID:       92873da8-6ad4-4f7e-b0e5-556df2dc0b82
+:END:
 #+begin_src emacs-lisp
   (use-package org-agenda
     :ensure nil
