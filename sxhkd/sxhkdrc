@@ -1,50 +1,60 @@
 ######################################################################
-# F keys
+# Most Used
 # toggle darkman 
 super + F5
       darkman toggle
       
 # focus/start emacs
 F1
-      ~/.config/scripts/emacs-focus.sh 
+      ~/.config/scripts/window-focus-or-create.sh emacs
 
 # focus/start firefox
 F2
-      ~/.config/scripts/firefox-focus.sh
+      ~/.config/scripts/window-focus-or-create.sh firefox
 
 # focus/start terminal
 F3
-      ~/.config/scripts/terminal-focus.sh
+      ~/.config/scripts/window-focus-or-create.sh terminal
 
 # focus/start vscode
 F4
-      ~/.config/scripts/vscode-focus.sh
+      ~/.config/scripts/window-focus-or-create.sh code
 
-# focus last node (alt tab equivalent)
-F5
-	bspc node -f last.local
-
-# cycle between nodes
-F6
-	bspc node -f prev.local.!hidden.window
 
 # toggle between fullscreen and floating
-F7
+F5
     if bspc query -N -n focused.floating > /dev/null || bspc query -N -n focused.tiled > /dev/null; \ 
         then bspc node -t fullscreen; \
     elif bspc query -N -n focused.fullscreen > /dev/null; \
         then bspc node -t floating; \
     fi
+    
+# fast note outside of emacs
+super + n
+    bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-my-denote-zk)'
+	
+# focus last node (alt tab equivalent)
+F9
+	bspc node -f last.local
 
-# kill ndoe
-F8
+# cycle between nodes prev
+F10
+	bspc node -f prev.local.!hidden.window
+
+# cycle between nodes next
+F11
+	bspc node -f next.local.!hidden.window
+
+# kill node
+F12
 	bspc node -c
+	
+# outputs text from file defined in the first arg
+@KP_Insert
+	~/.config/scripts/type_macro.sh ~/Nextcloud/macros/getit.txt
 
 
 ######################################################################
-#super + i
-#      bspc rule -a 'Emacs' state=floating && emacsclient -e '(my-window-popup-my-latex-scratch-buffer)'
-      
 
 
 # rofi
@@ -170,9 +180,7 @@ super + shift + {d,a}
 
 
 ######################################################################
-# numpad keys
 
-# focus firefox
-KP_Insert
-	~/.config/scripts/firefox-focus.sh
+
+
 

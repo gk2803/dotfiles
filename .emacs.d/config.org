@@ -864,10 +864,12 @@ sunrise times and choose a theme accordingly.
     (setq calendar-location-name "Serres, Greece")
     )
 #+end_src
-* Modus Themes
+* Themes
 :PROPERTIES:
 :ID:       9d0cbd6e-75b7-442f-a34b-618a59843523
 :END:
+
+** Modus Themes
 change the theme based on the sunset and sunrise times.
 #+begin_src emacs-lisp
   (use-package modus-themes
@@ -884,12 +886,21 @@ change the theme based on the sunset and sunrise times.
        (shell-command-to-string "cat ~/.config/xsettingsd/xsettingsd.conf |grep Net/ThemeName")))
 
     (if (my-dark-theme-p) 
-        (modus-themes-load-theme 'modus-vivendi)
+        (modus-themes-load-theme 'vscode-dark-plus)
       (modus-themes-load-theme 'modus-operandi))
 
     
-    (setq modus-themes-to-toggle '(modus-operandi modus-vivendi)))
+    (setq modus-themes-to-toggle '(vscode-dark-plus modus-vivendi)))
 #+end_src
+
+** dark plus
+#+begin_src emacs-lisp
+  (use-package vscode-dark-plus-theme
+  :ensure t
+  :config)
+
+#+end_src
+
 * RSS/Atom 
 #+begin_src emacs-lisp
     (use-package elfeed
@@ -1304,13 +1315,18 @@ https://emacs.stackexchange.com/questions/20679/enable-greek-spellchecking
   (declare-function my-latex-scratch-buffer "my-latex-scratch-buffer" (&optional goto keys))
   (my-window-define-with-popup-frame my-latex-scratch-buffer)
 
+  (declare-function my-denote-zk "my-denote-zk" (&optional goto keys))
+  (my-window-define-with-popup-frame my-denote-zk)
+
   ;;control firefox youtube-player from emacs
   (global-set-key (kbd "<XF86AudioPlay>")
-    		(lambda () (interactive) (shell-command "~/.config/scripts/yt-start-pause.sh")))
+    		(lambda () (interactive) (shell-command "~/.config/scripts/yt-control.sh space")))
   (global-set-key (kbd "<XF86AudioLowerVolume>")
-    		(lambda () (interactive) (shell-command "~/.config/scripts/yt-moveb-5-secs.sh")))
+    		(lambda () (interactive) (shell-command "~/.config/scripts/yt-control.sh Left")))
   (global-set-key (kbd "<XF86AudioRaiseVolume>")
-    		(lambda () (interactive) (shell-command "~/.config/scripts/yt-movef-5-secs.sh")))
+    		(lambda () (interactive) (shell-command "~/.config/scripts/yt-control.sh Right")))
+
+
 
 
 
